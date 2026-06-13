@@ -259,7 +259,7 @@ private struct InspectorView: View {
                 VStack(alignment: .leading, spacing: 4) {
                     Text("Recipe Controls")
                         .font(.headline)
-                    Text("Tuning scales the selected camera and film.")
+                    Text("Tuning scales the selected camera mode.")
                         .font(.caption)
                         .foregroundStyle(.white.opacity(0.52))
                 }
@@ -345,7 +345,7 @@ private struct FilmPicker: View {
                     .foregroundStyle(.white.opacity(0.56))
             }
 
-            Picker("Film Stock", selection: $editor.selectedFilm) {
+            Picker("Film / Mode", selection: $editor.selectedFilm) {
                 ForEach(editor.compatibleFilms) { film in
                     Text(film.displayName).tag(film)
                 }

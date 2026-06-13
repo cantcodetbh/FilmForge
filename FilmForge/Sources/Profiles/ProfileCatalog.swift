@@ -5,16 +5,24 @@ enum ProfileCatalog {
     static let cameras: [CameraProfile] = [
         canonAE1,
         contaxT2,
+        yashicaT4,
+        olympusXA,
         hasselblad500,
         mamiyaRB67,
+        pentax67,
         olympusPenF,
+        lomoLCA,
         holga120N,
         dianaF,
         polaroidSX70,
+        fujiNaturaClassica,
         disposableFlash,
         canonG2,
         sonyF707,
-        miniDVGrab
+        miniDVGrab,
+        sonyMavicaFD,
+        gameBoyCamera,
+        fxnR
     ]
 
     static let filmStocks: [FilmStock] = [
@@ -50,6 +58,9 @@ enum ProfileCatalog {
     }
 
     static func compatibleFilms(for camera: CameraProfile) -> [FilmStock] {
+        let authored = authoredFilms(for: camera)
+        if !authored.isEmpty { return authored }
+
         switch camera.format {
         case .instant:
             return [instantColor, triX400]
@@ -61,12 +72,18 @@ enum ProfileCatalog {
     }
 
     static func makeProfile(camera: CameraProfile, film: FilmStock) -> FilmProfile {
-        let recipe = RecipeComposer.combine(camera.recipe, film.recipe)
+        let recipe: FilmRecipe
+        switch film.behavior {
+        case .composeWithCamera:
+            recipe = RecipeComposer.combine(camera.recipe, film.recipe)
+        case .completeProfile:
+            recipe = film.recipe
+        }
         return FilmProfile(
             id: "\(camera.id)-\(film.id)",
-            displayName: "\(camera.displayName) + \(film.displayName)",
+            displayName: "\(camera.displayName) / \(film.displayName)",
             tagline: "\(camera.format.rawValue) • \(film.family.rawValue)",
-            description: "\(camera.description) Film response: \(film.description)",
+            description: "\(camera.description) Mode response: \(film.description)",
             cameraName: camera.displayName,
             filmName: film.displayName,
             accent: ProfileAccent(
@@ -90,6 +107,342 @@ enum ProfileCatalog {
                 borderEnabled: camera.recipe.border.style != .none
             )
         )
+    }
+
+    private static func authoredFilms(for camera: CameraProfile) -> [FilmStock] {
+        switch camera.id {
+        case canonAE1.id:
+            return [
+                authoredFilm(camera: camera, stock: portra400, suffix: "portra", name: "Portra 400 AE", tagline: "Warm SLR negative") {
+                    $0.vignette.amount *= 0.75
+                    $0.lens.sharpen += 0.08
+                },
+                authoredFilm(camera: camera, stock: ultramax400, suffix: "gold-party", name: "Gold Party 400", tagline: "Consumer flash warmth") {
+                    $0.color.temperature += 0.08
+                    $0.bloom.amount += 0.04
+                    $0.grain.amount += 0.1
+                },
+                authoredFilm(camera: camera, stock: triX400, suffix: "trix-street", name: "Tri-X Street", tagline: "Classic mono SLR") {
+                    $0.color.contrast *= 1.08
+                    $0.grain.amount += 0.12
+                },
+                authoredFilm(camera: camera, stock: ektachromeE100, suffix: "e100-slide", name: "E100 Slide", tagline: "Clean projector colour") {
+                    $0.color.saturation *= 1.05
+                    $0.tone.p4.y = 1
+                }
+            ]
+        case contaxT2.id:
+            return [
+                authoredFilm(camera: camera, stock: portra400, suffix: "zeiss-portra", name: "Zeiss Portra", tagline: "Glossy compact skin") {
+                    $0.lens.sharpen += 0.18
+                    $0.color.contrast *= 1.04
+                },
+                authoredFilm(camera: camera, stock: ektar100, suffix: "travel-reds", name: "Travel Reds", tagline: "Crisp saturated compact") {
+                    $0.lens.sharpen += 0.22
+                    $0.color.redBias *= 1.03
+                },
+                authoredFilm(camera: camera, stock: triX400, suffix: "flash-mono", name: "Flash Mono", tagline: "Hard compact B&W") {
+                    $0.color.contrast *= 1.12
+                    $0.lens.sharpen += 0.15
+                }
+            ]
+        case yashicaT4.id:
+            return [
+                authoredFilm(camera: camera, stock: ektar100, suffix: "tessar-pop", name: "Tessar Pop", tagline: "Sharp colour punch") {
+                    $0.lens.sharpen += 0.26
+                    $0.color.saturation *= 1.08
+                },
+                authoredFilm(camera: camera, stock: portra400, suffix: "t4-daylight", name: "Daylight T*", tagline: "Clean compact daylight") {
+                    $0.color.temperature -= 0.02
+                    $0.lens.sharpen += 0.18
+                },
+                authoredFilm(camera: camera, stock: triX400, suffix: "t4-mono", name: "T* Mono", tagline: "Crisp pocket B&W") {
+                    $0.color.contrast *= 1.16
+                    $0.grain.amount += 0.08
+                }
+            ]
+        case olympusXA.id:
+            return [
+                authoredFilm(camera: camera, stock: ultramax400, suffix: "xa-pocket-gold", name: "Pocket Gold", tagline: "Warm tiny rangefinder") {
+                    $0.vignette.amount += 0.16
+                    $0.lens.edgeSoftness += 0.12
+                },
+                authoredFilm(camera: camera, stock: hp5Plus, suffix: "xa-rain-mono", name: "Rain Mono", tagline: "Moody soft corners") {
+                    $0.color.contrast *= 1.08
+                    $0.vignette.amount += 0.1
+                },
+                authoredFilm(camera: camera, stock: ektachromeE100, suffix: "xa-blue-hour", name: "Blue Hour", tagline: "Cool pocket chrome") {
+                    $0.color.temperature -= 0.08
+                    $0.lens.edgeSoftness += 0.08
+                }
+            ]
+        case hasselblad500.id:
+            return [
+                authoredFilm(camera: camera, stock: portra400, suffix: "square-portra", name: "Square Portra", tagline: "Calm studio negative") {
+                    $0.grain.amount *= 0.72
+                    $0.color.contrast *= 0.96
+                },
+                authoredFilm(camera: camera, stock: ektar100, suffix: "square-ekar", name: "Gallery Ektar", tagline: "Fine-grain colour square") {
+                    $0.grain.amount *= 0.65
+                    $0.lens.sharpen += 0.1
+                },
+                authoredFilm(camera: camera, stock: hp5Plus, suffix: "square-hp5", name: "HP5 Contact", tagline: "Soft medium-format mono") {
+                    $0.grain.amount *= 0.78
+                    $0.tone.p0.y += 0.02
+                }
+            ]
+        case mamiyaRB67.id:
+            return [
+                authoredFilm(camera: camera, stock: portra400, suffix: "rb-portrait", name: "Portrait 400", tagline: "Creamy 6x7 skin") {
+                    $0.color.temperature += 0.06
+                    $0.bloom.amount += 0.02
+                },
+                authoredFilm(camera: camera, stock: ektar100, suffix: "rb-studio", name: "Studio Ektar", tagline: "Controlled vivid 6x7") {
+                    $0.color.contrast *= 0.95
+                    $0.grain.amount *= 0.7
+                },
+                authoredFilm(camera: camera, stock: triX400, suffix: "rb-trix", name: "Tri-X Portrait", tagline: "Large negative grit") {
+                    $0.grain.amount *= 0.82
+                    $0.tone.p3.y += 0.04
+                }
+            ]
+        case pentax67.id:
+            return [
+                authoredFilm(camera: camera, stock: portra400, suffix: "105-portra", name: "105 Portrait", tagline: "Large-format glow") {
+                    $0.bloom.amount += 0.06
+                    $0.lens.softness += 0.04
+                    $0.grain.amount *= 0.68
+                },
+                authoredFilm(camera: camera, stock: triX400, suffix: "105-trix", name: "Fashion Tri-X", tagline: "Sculpted mono pop") {
+                    $0.color.contrast *= 1.12
+                    $0.grain.amount *= 0.78
+                },
+                authoredFilm(camera: camera, stock: velvia50, suffix: "67-velvia", name: "Velvia Landscape", tagline: "Huge chrome colour") {
+                    $0.color.saturation *= 1.08
+                    $0.vignette.amount *= 0.65
+                }
+            ]
+        case olympusPenF.id:
+            return [
+                authoredFilm(camera: camera, stock: ultramax400, suffix: "half-diary", name: "Half Diary", tagline: "Travel grain") {
+                    $0.grain.amount += 0.18
+                    $0.vignette.amount += 0.08
+                },
+                authoredFilm(camera: camera, stock: triX400, suffix: "half-trix", name: "Half Tri-X", tagline: "Tiny-frame mono") {
+                    $0.grain.amount += 0.24
+                    $0.color.contrast *= 1.08
+                },
+                authoredFilm(camera: camera, stock: provia100F, suffix: "half-provia", name: "Half Provia", tagline: "Sharp travel chrome") {
+                    $0.color.saturation *= 1.06
+                    $0.lens.sharpen += 0.08
+                }
+            ]
+        case lomoLCA.id:
+            return [
+                authoredFilm(camera: camera, stock: ultramax400, suffix: "lomo-color", name: "LC-A Color 400", tagline: "Saturated vignette") {
+                    $0.color.saturation *= 1.18
+                    $0.vignette.amount += 0.35
+                },
+                authoredFilm(camera: camera, stock: velvia50, suffix: "xpro-slide", name: "X-Pro Slide", tagline: "Cross-processed punch") {
+                    $0.color.temperature += 0.1
+                    $0.color.cyanShift -= 0.16
+                    $0.color.yellowShift += 0.18
+                    $0.tone.p0.y += 0.04
+                },
+                authoredFilm(camera: camera, stock: ultramax400, suffix: "redscale", name: "Redscale", tagline: "Burnt orange experiment") {
+                    $0.color.temperature += 0.42
+                    $0.color.redBias *= 1.16
+                    $0.color.blueBias *= 0.72
+                    $0.tone.p4.y = 0.9
+                },
+                authoredFilm(camera: camera, stock: ultramax400, suffix: "fisheye", name: "Fisheye Color", tagline: "Bulged lomo lens") {
+                    $0.lens.fisheye = 0.85
+                    $0.vignette.amount += 0.45
+                    $0.aberration.amount += 0.35
+                }
+            ]
+        case holga120N.id:
+            return [
+                authoredFilm(camera: camera, stock: ultramax400, suffix: "holga-color", name: "Plastic Color", tagline: "Dreamy toy 120") {
+                    $0.lens.edgeSoftness += 0.16
+                    $0.vignette.amount += 0.28
+                },
+                authoredFilm(camera: camera, stock: triX400, suffix: "holga-mono", name: "Plastic Mono", tagline: "Soft square B&W") {
+                    $0.grain.amount += 0.16
+                    $0.vignette.amount += 0.22
+                },
+                authoredFilm(camera: camera, stock: ultramax400, suffix: "holga-leak", name: "Light Leak Color", tagline: "Warm rough toy") {
+                    $0.halation.amount += 0.12
+                    $0.bloom.amount += 0.12
+                    $0.color.temperature += 0.18
+                },
+                authoredFilm(camera: camera, stock: ultramax400, suffix: "holga-fisheye", name: "Fisheye Toy", tagline: "Rounded plastic bend") {
+                    $0.lens.fisheye = 0.75
+                    $0.vignette.amount += 0.5
+                }
+            ]
+        case dianaF.id:
+            return [
+                authoredFilm(camera: camera, stock: ultramax400, suffix: "diana-dream", name: "Dream Color", tagline: "Soft low-fi colour") {
+                    $0.bloom.amount += 0.12
+                    $0.lens.softness += 0.12
+                },
+                authoredFilm(camera: camera, stock: ektachromeE100, suffix: "diana-xpro", name: "Purple X-Pro", tagline: "Surreal slide cast") {
+                    $0.color.tint += 0.16
+                    $0.color.blueBias *= 1.12
+                    $0.vignette.amount += 0.25
+                },
+                authoredFilm(camera: camera, stock: ultramax400, suffix: "diana-fisheye", name: "Fisheye Dream", tagline: "Soft bent edges") {
+                    $0.lens.fisheye = 0.7
+                    $0.bloom.amount += 0.1
+                }
+            ]
+        case polaroidSX70.id:
+            return [
+                authoredFilm(camera: camera, stock: instantColor, suffix: "sx70-color", name: "SX-70 Color", tagline: "Slow warm instant") {
+                    $0.color.temperature += 0.12
+                    $0.tone.p0.y += 0.04
+                },
+                authoredFilm(camera: camera, stock: instantColor, suffix: "sx70-expired", name: "Expired SX-70", tagline: "Faded chemistry") {
+                    $0.color.saturation *= 0.78
+                    $0.tone.p0.y += 0.08
+                    $0.dust.amount += 0.04
+                },
+                authoredFilm(camera: camera, stock: triX400, suffix: "sx70-bw", name: "SX-70 B&W", tagline: "Soft instant mono") {
+                    $0.color.monochrome = true
+                    $0.color.saturation = 0
+                    $0.border.style = .instant
+                }
+            ]
+        case fujiNaturaClassica.id:
+            return [
+                authoredFilm(camera: camera, stock: ultramax400, suffix: "natura-1600", name: "Natura 1600 Night", tagline: "No-flash low light") {
+                    $0.color.temperature -= 0.04
+                    $0.grain.amount += 0.24
+                    $0.tone.p0.y += 0.04
+                },
+                authoredFilm(camera: camera, stock: portra400, suffix: "press-800-push", name: "Press 800 Push", tagline: "Warm available light") {
+                    $0.color.temperature += 0.08
+                    $0.grain.amount += 0.22
+                    $0.bloom.amount += 0.06
+                },
+                authoredFilm(camera: camera, stock: ektachromeE100, suffix: "fluorescent", name: "Fluorescent Shop", tagline: "Green-blue interior cast") {
+                    $0.color.temperature -= 0.18
+                    $0.color.greenBias *= 1.08
+                    $0.color.tint -= 0.12
+                }
+            ]
+        case disposableFlash.id:
+            return [
+                authoredFilm(camera: camera, stock: ultramax400, suffix: "flash-party", name: "Flash Party", tagline: "Hard disposable flash") {
+                    $0.color.exposure += 0.12
+                    $0.vignette.amount += 0.12
+                },
+                authoredFilm(camera: camera, stock: ultramax400, suffix: "beach-day", name: "Beach Day", tagline: "Cheap sun colour") {
+                    $0.color.saturation *= 1.12
+                    $0.color.temperature += 0.1
+                },
+                authoredFilm(camera: camera, stock: triX400, suffix: "flash-mono", name: "Flash Mono", tagline: "Point-blank B&W") {
+                    $0.color.contrast *= 1.2
+                    $0.grain.amount += 0.18
+                },
+                authoredFilm(camera: camera, stock: ultramax400, suffix: "fisheye-flash", name: "Fisheye Flash", tagline: "Skate mag bend") {
+                    $0.lens.fisheye = 0.8
+                    $0.vignette.amount += 0.35
+                }
+            ]
+        case canonG2.id:
+            return [
+                authoredFilm(camera: camera, stock: digitalCCD, suffix: "warm-jpeg", name: "Warm JPEG", tagline: "Early compact colour") {
+                    $0.color.temperature += 0.08
+                    $0.lens.sharpen += 0.1
+                },
+                authoredFilm(camera: camera, stock: digitalCCD, suffix: "office-flash", name: "Office Flash", tagline: "Brittle indoor CCD") {
+                    $0.color.exposure += 0.12
+                    $0.bloom.amount += 0.04
+                },
+                authoredFilm(camera: camera, stock: digitalCCD, suffix: "low-res", name: "Low-res Web", tagline: "Downsampled upload") {
+                    $0.lens.downsample = 0.45
+                    $0.lens.sharpen += 0.3
+                }
+            ]
+        case sonyF707.id:
+            return [
+                authoredFilm(camera: camera, stock: digitalCCD, suffix: "cyber-vivid", name: "Cyber Vivid", tagline: "Saturated CCD reds") {
+                    $0.color.saturation *= 1.18
+                    $0.aberration.amount += 0.35
+                },
+                authoredFilm(camera: camera, stock: digitalCCD, suffix: "purple-fringe", name: "Purple Fringe", tagline: "Hard highlight edges") {
+                    $0.color.tint += 0.08
+                    $0.aberration.amount += 0.65
+                }
+            ]
+        case miniDVGrab.id:
+            return [
+                authoredFilm(camera: camera, stock: digitalCCD, suffix: "tape-still", name: "Tape Still", tagline: "Video frame grab") {
+                    $0.lens.downsample = 0.38
+                    $0.color.contrast *= 1.1
+                },
+                authoredFilm(camera: camera, stock: digitalCCD, suffix: "night-tape", name: "Night Tape", tagline: "Blue noisy camcorder") {
+                    $0.color.temperature -= 0.22
+                    $0.grain.amount += 0.28
+                    $0.bloom.amount += 0.08
+                }
+            ]
+        case sonyMavicaFD.id:
+            return [
+                authoredFilm(camera: camera, stock: digitalCCD, suffix: "floppy-640", name: "Floppy 640", tagline: "JPEG smear") {
+                    $0.lens.downsample = 0.26
+                    $0.lens.sharpen += 0.55
+                },
+                authoredFilm(camera: camera, stock: digitalCCD, suffix: "fine-mode", name: "Fine Mode", tagline: "Chunky early digital") {
+                    $0.lens.downsample = 0.34
+                    $0.color.saturation *= 0.9
+                }
+            ]
+        case gameBoyCamera.id:
+            return [
+                authoredFilm(camera: camera, stock: digitalCCD, suffix: "dmg-green", name: "DMG Green", tagline: "Four-tone green") {
+                    $0.color.monochrome = true
+                    $0.color.temperature += 0.3
+                    $0.lens.downsample = 0.18
+                    $0.lens.sharpen += 0.9
+                    $0.border.style = .thin
+                },
+                authoredFilm(camera: camera, stock: digitalCCD, suffix: "pocket-mono", name: "Pocket Mono", tagline: "Harsh dither B&W") {
+                    $0.color.monochrome = true
+                    $0.color.contrast *= 1.5
+                    $0.lens.downsample = 0.16
+                },
+                authoredFilm(camera: camera, stock: digitalCCD, suffix: "thermal-print", name: "Thermal Print", tagline: "Washed tiny print") {
+                    $0.color.monochrome = true
+                    $0.tone.p0.y += 0.16
+                    $0.tone.p4.y = 0.82
+                    $0.lens.downsample = 0.14
+                }
+            ]
+        case fxnR.id:
+            return [
+                authoredFilm(camera: camera, stock: digitalCCD, suffix: "amber-cafe", name: "Amber Cafe", tagline: "Warm FXN interior") {
+                    $0.color.temperature += 0.42
+                    $0.color.redBias *= 1.08
+                    $0.bloom.amount += 0.08
+                },
+                authoredFilm(camera: camera, stock: digitalCCD, suffix: "flash-wood", name: "Flash Wood", tagline: "Bright warm flash") {
+                    $0.color.exposure += 0.18
+                    $0.color.temperature += 0.36
+                    $0.halation.amount += 0.08
+                },
+                authoredFilm(camera: camera, stock: digitalCCD, suffix: "urban-night", name: "Urban Night", tagline: "Soft neon amber") {
+                    $0.color.temperature += 0.18
+                    $0.color.contrast *= 1.12
+                    $0.grain.amount += 0.18
+                    $0.bloom.amount += 0.12
+                }
+            ]
+        default:
+            return []
+        }
     }
 
     // MARK: Cameras
@@ -130,6 +483,46 @@ enum ProfileCatalog {
             vignette: 0.28,
             lens: LensRecipe(softness: 0, edgeSoftness: 0.04, sharpen: 0.42, downsample: 1),
             aberration: 0.12,
+            border: .none
+        )
+    )
+
+    static let yashicaT4 = CameraProfile(
+        id: "yashica-t4-reference",
+        displayName: "Yashica T4",
+        reference: "Carl Zeiss Tessar T* 35mm compact archetype",
+        format: .thirtyFive,
+        tagline: "Tessar pocket snap",
+        description: "A sharp 35mm compact look with hard microcontrast, clean center detail, and glossy point-and-shoot colour.",
+        accent: ProfileAccent(red: 0.62, green: 0.72, blue: 0.84),
+        recipe: cameraRecipe(
+            color: color(exposure: 0.01, contrast: 1.12, saturation: 1.04, temperature: 0, tint: 0.01, red: 1.01, green: 1.01, blue: 1),
+            tone: curve(0, 0.18, 0.5, 0.84, 0.99),
+            bloom: 0.03,
+            halation: 0.03,
+            vignette: 0.24,
+            lens: LensRecipe(softness: 0, edgeSoftness: 0.05, sharpen: 0.55, downsample: 1),
+            aberration: 0.16,
+            border: .none
+        )
+    )
+
+    static let olympusXA = CameraProfile(
+        id: "olympus-xa-reference",
+        displayName: "Olympus XA",
+        reference: "Pocket 35mm rangefinder / Zuiko compact archetype",
+        format: .thirtyFive,
+        tagline: "Pocket rangefinder mood",
+        description: "Tiny 35mm rangefinder behavior with intimate contrast, visible corner falloff, and soft pocket-camera edges.",
+        accent: ProfileAccent(red: 0.72, green: 0.62, blue: 0.52),
+        recipe: cameraRecipe(
+            color: color(exposure: -0.01, contrast: 1.02, saturation: 0.98, temperature: 0.03, tint: -0.01, red: 1.01, green: 1, blue: 0.98),
+            tone: curve(0.03, 0.23, 0.5, 0.78, 0.96),
+            bloom: 0.02,
+            halation: 0.03,
+            vignette: 0.42,
+            lens: LensRecipe(softness: 0.05, edgeSoftness: 0.22, sharpen: 0.08, downsample: 0.98),
+            aberration: 0.18,
             border: .none
         )
     )
@@ -176,6 +569,27 @@ enum ProfileCatalog {
         )
     )
 
+    static let pentax67 = CameraProfile(
+        id: "pentax-67-reference",
+        displayName: "Pentax 67",
+        reference: "6x7 medium-format SLR / 105mm portrait archetype",
+        format: .medium120,
+        tagline: "Huge 6x7 portrait glow",
+        description: "Big negative rendering with smooth tonal separation, creamy highlights, subtle falloff, and larger-than-35mm calm.",
+        accent: ProfileAccent(red: 0.76, green: 0.64, blue: 0.56),
+        recipe: cameraRecipe(
+            color: color(exposure: 0.04, brightness: 0.01, contrast: 0.95, saturation: 1.01, temperature: 0.04, tint: 0, red: 1.01, green: 1, blue: 0.99),
+            tone: curve(0.04, 0.27, 0.52, 0.77, 0.95),
+            grain: GrainRecipe(amount: -0.12, scale: -0.25, monochrome: true, shadows: 0, highlights: 0),
+            bloom: 0.05,
+            halation: 0.05,
+            vignette: 0.14,
+            lens: LensRecipe(softness: 0.04, edgeSoftness: 0.03, sharpen: 0.12, downsample: 1),
+            aberration: 0.03,
+            border: .print
+        )
+    )
+
     static let olympusPenF = CameraProfile(
         id: "olympus-pen-f-reference",
         displayName: "Olympus Pen F",
@@ -194,6 +608,27 @@ enum ProfileCatalog {
             lens: LensRecipe(softness: 0.08, edgeSoftness: 0.18, sharpen: 0.05, downsample: 0.96),
             aberration: 0.15,
             border: .halfFrame
+        )
+    )
+
+    static let lomoLCA = CameraProfile(
+        id: "lomo-lca-reference",
+        displayName: "Lomo LC-A",
+        reference: "Soviet compact / Lomographic saturation-vignette archetype",
+        format: .thirtyFive,
+        tagline: "Saturated vignette snap",
+        description: "Compact Lomographic style with heavy corner density, punchy colour, imperfect exposure, and high-energy contrast.",
+        accent: ProfileAccent(red: 0.95, green: 0.35, blue: 0.28),
+        recipe: cameraRecipe(
+            color: color(exposure: -0.04, brightness: 0.01, contrast: 1.16, saturation: 1.18, temperature: 0.08, tint: 0.03, red: 1.05, green: 0.98, blue: 0.98),
+            tone: curve(0.02, 0.16, 0.5, 0.84, 0.96),
+            bloom: 0.06,
+            halation: 0.06,
+            vignette: 0.92,
+            lens: LensRecipe(softness: 0.07, edgeSoftness: 0.26, sharpen: 0.04, downsample: 0.96),
+            aberration: 0.32,
+            dust: 0.04,
+            border: .thin
         )
     )
 
@@ -257,6 +692,27 @@ enum ProfileCatalog {
             aberration: 0.04,
             dust: 0.03,
             border: .instant
+        )
+    )
+
+    static let fujiNaturaClassica = CameraProfile(
+        id: "fuji-natura-classica-reference",
+        displayName: "Fuji Natura Classica",
+        reference: "Low-light 35mm compact / Natura 1600 archetype",
+        format: .thirtyFive,
+        tagline: "No-flash night colour",
+        description: "Low-light compact behavior with available-light warmth, high-speed grain, subdued flash use, and indoor colour casts.",
+        accent: ProfileAccent(red: 0.44, green: 0.72, blue: 0.56),
+        recipe: cameraRecipe(
+            color: color(exposure: 0.08, brightness: 0.02, contrast: 0.96, saturation: 0.98, temperature: 0.02, tint: -0.03, red: 1.01, green: 1.02, blue: 0.99),
+            tone: curve(0.06, 0.27, 0.52, 0.78, 0.94),
+            grain: GrainRecipe(amount: 0.18, scale: 0.3, monochrome: false, shadows: 0.25, highlights: 0.12),
+            bloom: 0.07,
+            halation: 0.04,
+            vignette: 0.22,
+            lens: LensRecipe(softness: 0.04, edgeSoftness: 0.08, sharpen: 0.08, downsample: 0.97),
+            aberration: 0.12,
+            border: .none
         )
     )
 
@@ -341,6 +797,69 @@ enum ProfileCatalog {
             vignette: 0.1,
             lens: LensRecipe(softness: 0, edgeSoftness: 0, sharpen: 1.25, downsample: 0.45),
             aberration: 0.75,
+            border: .none
+        )
+    )
+
+    static let sonyMavicaFD = CameraProfile(
+        id: "sony-mavica-fd-reference",
+        displayName: "Sony Mavica FD",
+        reference: "Floppy-disk early digital still camera archetype",
+        format: .ccd,
+        tagline: "Floppy JPEG digital",
+        description: "Low-resolution floppy-camera output with visible JPEG-era crunch, clipped highlights, and smeared early digital colour.",
+        accent: ProfileAccent(red: 0.38, green: 0.52, blue: 0.82),
+        recipe: cameraRecipe(
+            color: color(exposure: 0.01, contrast: 1.18, saturation: 0.92, temperature: -0.04, tint: -0.02, red: 0.98, green: 1.02, blue: 1.04),
+            tone: curve(0, 0.15, 0.5, 0.88, 0.96),
+            grain: GrainRecipe(amount: 0.55, scale: 0.8, monochrome: false, shadows: 0.9, highlights: 0.8),
+            bloom: 0.02,
+            halation: 0,
+            vignette: 0.08,
+            lens: LensRecipe(softness: 0, edgeSoftness: 0.02, sharpen: 1.25, downsample: 0.3),
+            aberration: 0.35,
+            border: .none
+        )
+    )
+
+    static let gameBoyCamera = CameraProfile(
+        id: "game-boy-camera-reference",
+        displayName: "Game Boy Camera",
+        reference: "Four-tone low-resolution toy digital camera archetype",
+        format: .ccd,
+        tagline: "Tiny dither toycam",
+        description: "Extremely low-resolution monochrome toy-camera behavior with hard contrast, posterized tones, and printer-like texture.",
+        accent: ProfileAccent(red: 0.54, green: 0.78, blue: 0.38),
+        recipe: cameraRecipe(
+            color: color(exposure: 0.02, contrast: 1.5, saturation: 0, temperature: 0.18, tint: -0.04, red: 0.92, green: 1.08, blue: 0.82),
+            tone: curve(0.12, 0.2, 0.48, 0.72, 0.88),
+            grain: GrainRecipe(amount: 0.34, scale: 0.6, monochrome: true, shadows: 0.8, highlights: 0.65),
+            bloom: 0,
+            halation: 0,
+            vignette: 0.05,
+            lens: LensRecipe(softness: 0, edgeSoftness: 0, sharpen: 1.6, downsample: 0.16),
+            aberration: 0,
+            border: .thin
+        )
+    )
+
+    static let fxnR = CameraProfile(
+        id: "fxn-r-inspired-reference",
+        displayName: "FXN R",
+        reference: "Dazz-style FXN R inspired warm digital profile",
+        format: .ccd,
+        tagline: "Amber app-camera night",
+        description: "A warm R-series app-camera style with amber interiors, soft flash, lifted blacks, and glossy urban-night colour.",
+        accent: ProfileAccent(red: 0.98, green: 0.62, blue: 0.28),
+        recipe: cameraRecipe(
+            color: color(exposure: 0.06, brightness: 0.02, contrast: 1.08, saturation: 1.08, temperature: 0.28, tint: 0.04, red: 1.08, green: 0.99, blue: 0.88),
+            tone: curve(0.06, 0.25, 0.52, 0.82, 0.96),
+            grain: GrainRecipe(amount: 0.32, scale: 0.95, monochrome: false, shadows: 0.75, highlights: 0.5),
+            bloom: 0.08,
+            halation: 0.08,
+            vignette: 0.2,
+            lens: LensRecipe(softness: 0.06, edgeSoftness: 0.08, sharpen: 0.35, downsample: 0.72),
+            aberration: 0.2,
             border: .none
         )
     )
@@ -550,6 +1069,33 @@ enum ProfileCatalog {
     )
 
     // MARK: Helpers
+
+    private static func authoredFilm(
+        camera: CameraProfile,
+        stock: FilmStock,
+        suffix: String,
+        name: String,
+        tagline: String,
+        edit: (inout FilmRecipe) -> Void
+    ) -> FilmStock {
+        var recipe = RecipeComposer.combine(camera.recipe, stock.recipe)
+        edit(&recipe)
+        return FilmStock(
+            id: "\(camera.id)-\(suffix)",
+            displayName: name,
+            reference: "\(camera.displayName) authored mode based on \(stock.reference)",
+            family: stock.family,
+            tagline: tagline,
+            description: "\(tagline). Tuned specifically for \(camera.displayName), including its lens, format, colour response, and processing character.",
+            accent: ProfileAccent(
+                red: (camera.accent.red * 0.5) + (stock.accent.red * 0.5),
+                green: (camera.accent.green * 0.5) + (stock.accent.green * 0.5),
+                blue: (camera.accent.blue * 0.5) + (stock.accent.blue * 0.5)
+            ),
+            recipe: recipe,
+            behavior: .completeProfile
+        )
+    }
 
     private static func cameraRecipe(
         color: ColorRecipe,

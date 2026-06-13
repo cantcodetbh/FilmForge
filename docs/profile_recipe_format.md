@@ -15,10 +15,13 @@ FilmForge profiles are composed from a camera recipe plus a film recipe.
 - Identity and display text.
 - Film family: color negative, slide, black and white, instant, digital sensor.
 - Film recipe.
+- Recipe behavior:
+  - `composeWithCamera` for generic reusable reference stocks.
+  - `completeProfile` for authored camera-specific film/mode profiles.
 
 `FilmProfile`
 
-- The composed camera + film profile actually rendered by the engine.
+- The selected camera + camera-owned film/mode profile actually rendered by the engine.
 - Produced by `ProfileCatalog.makeProfile(camera:film:)`.
 
 `FilmRecipe`
@@ -63,15 +66,27 @@ Reference:
 
 - [Apple CIColorCube](https://developer.apple.com/documentation/coreimage/cicolorcube)
 
-## Composition Rules
+## Camera-Owned Modes
 
-`RecipeComposer.combine` merges camera and film values:
+The product model now prefers camera-owned modes over global film stock overlays. `ProfileCatalog.compatibleFilms(for:)` first asks for authored modes for the selected camera. Those authored modes are complete profile recipes and are not recomposed generically at render time.
+
+Examples:
+
+- `Lomo LC-A / X-Pro Slide` is tuned as a Lomo-specific cross-process look, not just Velvia pasted onto a Lomo body.
+- `Polaroid SX-70 / Expired SX-70` is tuned as SX-70 chemistry and frame behavior.
+- `Game Boy Camera / DMG Green` is a camera media mode, not a film stock.
+- `FXN R / Amber Cafe` is an app-camera inspired digital mode.
+- Fisheye options exist only on camera identities where that lens behavior feels plausible: Lomo/toy/disposable style profiles.
+
+## Fallback Composition Rules
+
+`RecipeComposer.combine` remains as a helper for building authored modes and for any future generic stock fallback. It merges camera and film values:
 
 - Multiplicative values such as contrast, saturation, and RGB bias are multiplied.
 - Additive values such as temperature, tint, CMY shifts, halation, bloom, grain, dust, and vignette are added or maxed depending on meaning.
 - Monochrome survives if either side requests it.
 - The camera border wins unless the camera has no border.
-- The composed profile receives a generated LUT recipe.
+- The composed helper output receives a generated LUT recipe.
 
 ## Future Recipe Fields
 
@@ -85,4 +100,3 @@ The current format is intentionally ready for:
 - True Metal stage identifiers.
 - External LUT bundles.
 - Profile versioning.
-

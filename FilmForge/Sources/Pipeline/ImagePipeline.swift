@@ -45,6 +45,7 @@ final class ImagePipeline {
         BloomStage(),
         HalationStage(),
         LensStage(),
+        FisheyeStage(),
         ChromaticAberrationStage(),
         VignetteStage(),
         GrainStage(),
@@ -368,6 +369,32 @@ struct LensStage: PipelineStage {
         }
 
         return output.cropped(to: extent)
+    }
+}
+
+struct FisheyeStage: PipelineStage {
+    func render(_ image: CIImage, context: RenderContext) throws -> CIImage {
+        let amount = context.profile.recipe.lens.fisheye * context.adjustments.intensity
+        guard amount > 0.001 else { return image }
+        let extent = image.extent
+        let base = min(extent.width, extent.height)
+        let center = CIVector(x: extent.midX, y: extent.midY)
+        let warped = image.applyingFilterIfAvailable("CIBumpDistortion", parameters: [
+            kCIInputCenterKey: center,
+            kCIInputRadiusKey: base * 0.72,
+            kCIInputScaleKey: 18 * clamped(amount, 0, 1)
+        ]).cropped(to: extent)
+
+        let edgeMask = radialEdgeMask(extent: extent, inner: base * 0.4, outer: base * 0.78)
+        let darkened = warped.applyingFilterIfAvailable("CIVignette", parameters: [
+            kCIInputIntensityKey: 0.8 * amount,
+            kCIInputRadiusKey: base * 0.42
+        ]).cropped(to: extent)
+
+        return darkened.applyingFilterIfAvailable("CIBlendWithMask", parameters: [
+            "inputBackgroundImage": warped,
+            "inputMaskImage": edgeMask
+        ]).cropped(to: extent)
     }
 }
 

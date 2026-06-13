@@ -25,6 +25,11 @@ struct CameraProfile: Identifiable, Hashable, Sendable {
     let recipe: FilmRecipe
 }
 
+enum FilmRecipeBehavior: Hashable, Sendable {
+    case composeWithCamera
+    case completeProfile
+}
+
 struct FilmStock: Identifiable, Hashable, Sendable {
     let id: String
     let displayName: String
@@ -34,6 +39,7 @@ struct FilmStock: Identifiable, Hashable, Sendable {
     let description: String
     let accent: ProfileAccent
     let recipe: FilmRecipe
+    var behavior: FilmRecipeBehavior = .composeWithCamera
 }
 
 enum CaptureFormat: String, CaseIterable, Hashable, Sendable {
@@ -181,6 +187,7 @@ struct LensRecipe: Hashable, Sendable {
     var edgeSoftness: Double
     var sharpen: Double
     var downsample: Double
+    var fisheye: Double = 0
 }
 
 struct AberrationRecipe: Hashable, Sendable {
