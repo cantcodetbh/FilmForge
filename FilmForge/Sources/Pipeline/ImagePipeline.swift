@@ -413,23 +413,51 @@ struct FisheyeStage: PipelineStage {
         guard amount > 0.001 else { return image }
         let extent = image.extent
         let base = min(extent.width, extent.height)
-        let center = CIVector(x: extent.midX, y: extent.midY)
-        let warped = image.applyingFilterIfAvailable("CIBumpDistortion", parameters: [
-            kCIInputCenterKey: center,
-            kCIInputRadiusKey: base * 0.72,
-            kCIInputScaleKey: 18 * clamped(amount, 0, 1)
+
+        let edgeMask = radialEdgeMask(extent: extent, inner: base * 0.26, outer: base * 0.62)
+        let softenedEdges = image
+            .applyingFilterIfAvailable("CIGaussianBlur", parameters: [
+                kCIInputRadiusKey: 1.0 + amount * 3.0
+            ])
+            .applyingFilterIfAvailable("CIBlendWithMask", parameters: [
+                "inputBackgroundImage": image,
+                "inputMaskImage": edgeMask
+            ])
+            .cropped(to: extent)
+
+        let redEdge = softenedEdges
+            .transformed(by: CGAffineTransform(translationX: amount * 1.4, y: 0))
+            .applyingFilterIfAvailable("CIColorMatrix", parameters: [
+                "inputRVector": CIVector(x: 1, y: 0, z: 0, w: 0),
+                "inputGVector": CIVector(x: 0, y: 0, z: 0, w: 0),
+                "inputBVector": CIVector(x: 0, y: 0, z: 0, w: 0),
+                "inputAVector": CIVector(x: 0, y: 0, z: 0, w: 0.16 * amount),
+                "inputBiasVector": CIVector(x: 0, y: 0, z: 0, w: 0)
+            ])
+        let cyanEdge = softenedEdges
+            .transformed(by: CGAffineTransform(translationX: -amount * 1.2, y: 0))
+            .applyingFilterIfAvailable("CIColorMatrix", parameters: [
+                "inputRVector": CIVector(x: 0, y: 0, z: 0, w: 0),
+                "inputGVector": CIVector(x: 0, y: 0.65, z: 0, w: 0),
+                "inputBVector": CIVector(x: 0, y: 0, z: 0.9, w: 0),
+                "inputAVector": CIVector(x: 0, y: 0, z: 0, w: 0.12 * amount),
+                "inputBiasVector": CIVector(x: 0, y: 0, z: 0, w: 0)
+            ])
+
+        let aberrated = cyanEdge
+            .applyingFilterIfAvailable("CIScreenBlendMode", parameters: [
+                "inputBackgroundImage": redEdge.applyingFilterIfAvailable("CIScreenBlendMode", parameters: [
+                    "inputBackgroundImage": softenedEdges
+                ])
+            ])
+            .cropped(to: extent)
+
+        let darkened = aberrated.applyingFilterIfAvailable("CIVignette", parameters: [
+            kCIInputIntensityKey: 1.25 * amount,
+            kCIInputRadiusKey: base * 0.46
         ]).cropped(to: extent)
 
-        let edgeMask = radialEdgeMask(extent: extent, inner: base * 0.4, outer: base * 0.78)
-        let darkened = warped.applyingFilterIfAvailable("CIVignette", parameters: [
-            kCIInputIntensityKey: 0.8 * amount,
-            kCIInputRadiusKey: base * 0.42
-        ]).cropped(to: extent)
-
-        return darkened.applyingFilterIfAvailable("CIBlendWithMask", parameters: [
-            "inputBackgroundImage": warped,
-            "inputMaskImage": edgeMask
-        ]).cropped(to: extent)
+        return mix(image, with: darkened, amount: min(0.85, 0.45 + amount * 0.35))
     }
 }
 
