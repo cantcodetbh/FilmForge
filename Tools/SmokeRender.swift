@@ -6,6 +6,7 @@ import Foundation
 struct SmokeRender {
     static func main() throws {
         let renderer = PreviewRenderer()
+        print("Metal kernels active: \(FilmKernelLibrary.usesMetalKernels)")
         let extent = CGRect(x: 0, y: 0, width: 256, height: 192)
         let gradient = CIFilter(name: "CILinearGradient")!
         gradient.setValue(CIVector(x: 0, y: 0), forKey: "inputPoint0")

@@ -221,6 +221,8 @@ struct SplitToneStage: PipelineStage {
 }
 
 struct FilmicResponseStage: CustomCIKernelStage {
+    var backend: StageBackend { FilmKernelLibrary.usesMetalKernels ? .metalShader : .customCoreImageKernel }
+
     func render(_ image: CIImage, context: RenderContext) throws -> CIImage {
         guard let kernel = FilmKernelLibrary.filmicResponse else { return image }
         let tone = context.profile.recipe.tone
@@ -338,7 +340,6 @@ struct LensStage: PipelineStage {
         let lens = context.profile.recipe.lens
         var output = image
         let extent = image.extent
-        let center = CIVector(x: extent.midX, y: extent.midY)
         let base = min(extent.width, extent.height)
 
         if lens.edgeSoftness > 0.001 {
@@ -364,14 +365,6 @@ struct LensStage: PipelineStage {
             output = output.applyingFilterIfAvailable("CISharpenLuminance", parameters: [
                 kCIInputSharpnessKey: lens.sharpen
             ])
-        }
-
-        if lens.downsample < 0.82 || lens.edgeSoftness > 0.18 {
-            output = output.applyingFilterIfAvailable("CIBumpDistortion", parameters: [
-                kCIInputCenterKey: center,
-                kCIInputRadiusKey: base * 0.78,
-                kCIInputScaleKey: -18 * max(0.08, lens.edgeSoftness)
-            ]).cropped(to: extent)
         }
 
         return output.cropped(to: extent)
@@ -426,7 +419,10 @@ struct VignetteStage: PipelineStage {
 }
 
 struct GrainStage: PipelineStage {
-    var backend: StageBackend { FilmKernelLibrary.filmGrain == nil ? .builtInCoreImage : .customCoreImageKernel }
+    var backend: StageBackend {
+        guard FilmKernelLibrary.filmGrain != nil else { return .builtInCoreImage }
+        return FilmKernelLibrary.usesMetalKernels ? .metalShader : .customCoreImageKernel
+    }
 
     func render(_ image: CIImage, context: RenderContext) throws -> CIImage {
         let recipe = context.profile.recipe.grain
