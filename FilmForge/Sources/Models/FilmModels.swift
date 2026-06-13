@@ -188,7 +188,76 @@ struct LensRecipe: Hashable, Sendable {
     var edgeSoftness: Double
     var sharpen: Double
     var downsample: Double
-    var fisheye: Double = 0
+    var fisheye: FisheyeRecipe = .none
+}
+
+struct FisheyeRecipe: Hashable, Sendable {
+    enum Projection: String, Hashable, Sendable {
+        case none
+        case diagonal
+        case circular
+        case croppedCircular
+    }
+
+    var projection: Projection
+    var strength: Double
+    var fieldOfView: Double
+    var imageCircle: Double
+    var edgeDarkness: Double
+    var edgeBlur: Double
+    var chromaticEdge: Double
+    var circleFeather: Double
+
+    static let none = FisheyeRecipe(
+        projection: .none,
+        strength: 0,
+        fieldOfView: 0,
+        imageCircle: 1,
+        edgeDarkness: 0,
+        edgeBlur: 0,
+        chromaticEdge: 0,
+        circleFeather: 0
+    )
+
+    static func diagonal(
+        strength: Double = 0.82,
+        fieldOfView: Double = 165,
+        edgeDarkness: Double = 0.55,
+        edgeBlur: Double = 0.18,
+        chromaticEdge: Double = 0.45
+    ) -> FisheyeRecipe {
+        FisheyeRecipe(
+            projection: .diagonal,
+            strength: strength,
+            fieldOfView: fieldOfView,
+            imageCircle: 1.18,
+            edgeDarkness: edgeDarkness,
+            edgeBlur: edgeBlur,
+            chromaticEdge: chromaticEdge,
+            circleFeather: 0.08
+        )
+    }
+
+    static func circular(
+        cropped: Bool,
+        strength: Double = 1,
+        fieldOfView: Double = 180,
+        imageCircle: Double = 0.94,
+        edgeDarkness: Double = 0.85,
+        edgeBlur: Double = 0.35,
+        chromaticEdge: Double = 0.65
+    ) -> FisheyeRecipe {
+        FisheyeRecipe(
+            projection: cropped ? .croppedCircular : .circular,
+            strength: strength,
+            fieldOfView: fieldOfView,
+            imageCircle: imageCircle,
+            edgeDarkness: edgeDarkness,
+            edgeBlur: edgeBlur,
+            chromaticEdge: chromaticEdge,
+            circleFeather: 0.055
+        )
+    }
 }
 
 struct OutputRecipe: Hashable, Sendable {
@@ -213,6 +282,10 @@ struct OutputRecipe: Hashable, Sendable {
     var dateStamp: Bool = false
     var flashFalloff: Double = 0
     var labControlsEnabled: Bool = false
+    var jpegCrunch: Double = 0
+    var chromaBleed: Double = 0
+    var lightLeak: Double = 0
+    var scanlines: Double = 0
 
     static let neutral = OutputRecipe()
 }

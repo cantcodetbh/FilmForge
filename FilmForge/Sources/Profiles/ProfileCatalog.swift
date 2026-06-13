@@ -116,64 +116,86 @@ enum ProfileCatalog {
                 authoredFilm(camera: camera, stock: portra400, suffix: "portra", name: "Portra 400 AE", tagline: "Warm SLR negative") {
                     $0.vignette.amount *= 0.75
                     $0.lens.sharpen += 0.08
+                    $0.color.saturation *= 0.96
+                    $0.tone.p4.y = 0.92
                 },
                 authoredFilm(camera: camera, stock: ultramax400, suffix: "gold-party", name: "Gold Party 400", tagline: "Consumer flash warmth") {
-                    $0.color.temperature += 0.08
+                    $0.color.temperature += 0.18
+                    $0.color.redBias *= 1.04
+                    $0.color.blueBias *= 0.9
                     $0.bloom.amount += 0.04
                     $0.grain.amount += 0.1
+                    $0.output.lightLeak = 0.18
                 },
                 authoredFilm(camera: camera, stock: triX400, suffix: "trix-street", name: "Tri-X Street", tagline: "Classic mono SLR") {
-                    $0.color.contrast *= 1.08
-                    $0.grain.amount += 0.12
+                    $0.color.contrast *= 1.2
+                    $0.grain.amount += 0.22
+                    $0.tone.p0.y = 0.02
+                    $0.tone.p3.y = 0.88
                 },
                 authoredFilm(camera: camera, stock: ektachromeE100, suffix: "e100-slide", name: "E100 Slide", tagline: "Clean projector colour") {
-                    $0.color.saturation *= 1.05
+                    $0.color.saturation *= 1.16
+                    $0.color.temperature -= 0.08
                     $0.tone.p4.y = 1
+                    $0.tone.p0.y = 0
                 }
             ]
         case contaxT2.id:
             return [
                 authoredFilm(camera: camera, stock: portra400, suffix: "zeiss-portra", name: "Zeiss Portra", tagline: "Glossy compact skin") {
                     $0.lens.sharpen += 0.18
-                    $0.color.contrast *= 1.04
+                    $0.color.contrast *= 1.08
+                    $0.color.saturation *= 1.08
+                    $0.bloom.amount += 0.04
                 },
                 authoredFilm(camera: camera, stock: ektar100, suffix: "travel-reds", name: "Travel Reds", tagline: "Crisp saturated compact") {
-                    $0.lens.sharpen += 0.22
-                    $0.color.redBias *= 1.03
+                    $0.lens.sharpen += 0.32
+                    $0.color.redBias *= 1.09
+                    $0.color.saturation *= 1.18
+                    $0.tone.p0.y = 0
                 },
                 authoredFilm(camera: camera, stock: triX400, suffix: "flash-mono", name: "Flash Mono", tagline: "Hard compact B&W") {
-                    $0.color.contrast *= 1.12
+                    $0.color.contrast *= 1.3
                     $0.lens.sharpen += 0.15
+                    $0.output.flashFalloff = 0.35
                 }
             ]
         case yashicaT4.id:
             return [
                 authoredFilm(camera: camera, stock: ektar100, suffix: "tessar-pop", name: "Tessar Pop", tagline: "Sharp colour punch") {
-                    $0.lens.sharpen += 0.26
-                    $0.color.saturation *= 1.08
+                    $0.lens.sharpen += 0.42
+                    $0.color.saturation *= 1.22
+                    $0.color.contrast *= 1.1
                 },
                 authoredFilm(camera: camera, stock: portra400, suffix: "t4-daylight", name: "Daylight T*", tagline: "Clean compact daylight") {
-                    $0.color.temperature -= 0.02
+                    $0.color.temperature -= 0.08
                     $0.lens.sharpen += 0.18
+                    $0.tone.p4.y = 0.98
                 },
                 authoredFilm(camera: camera, stock: triX400, suffix: "t4-mono", name: "T* Mono", tagline: "Crisp pocket B&W") {
-                    $0.color.contrast *= 1.16
-                    $0.grain.amount += 0.08
+                    $0.color.contrast *= 1.34
+                    $0.grain.amount += 0.18
+                    $0.lens.sharpen += 0.24
                 }
             ]
         case olympusXA.id:
             return [
                 authoredFilm(camera: camera, stock: ultramax400, suffix: "xa-pocket-gold", name: "Pocket Gold", tagline: "Warm tiny rangefinder") {
-                    $0.vignette.amount += 0.16
-                    $0.lens.edgeSoftness += 0.12
+                    $0.vignette.amount += 0.3
+                    $0.lens.edgeSoftness += 0.22
+                    $0.color.temperature += 0.16
+                    $0.output.lightLeak = 0.12
                 },
                 authoredFilm(camera: camera, stock: hp5Plus, suffix: "xa-rain-mono", name: "Rain Mono", tagline: "Moody soft corners") {
-                    $0.color.contrast *= 1.08
-                    $0.vignette.amount += 0.1
+                    $0.color.contrast *= 1.18
+                    $0.vignette.amount += 0.28
+                    $0.tone.p0.y += 0.03
                 },
                 authoredFilm(camera: camera, stock: ektachromeE100, suffix: "xa-blue-hour", name: "Blue Hour", tagline: "Cool pocket chrome") {
-                    $0.color.temperature -= 0.08
-                    $0.lens.edgeSoftness += 0.08
+                    $0.color.temperature -= 0.26
+                    $0.color.tint -= 0.08
+                    $0.lens.edgeSoftness += 0.18
+                    $0.tone.p0.y += 0.04
                 }
             ]
         case hasselblad500.id:
@@ -240,61 +262,85 @@ enum ProfileCatalog {
         case lomoLCA.id:
             return [
                 authoredFilm(camera: camera, stock: ultramax400, suffix: "lomo-color", name: "LC-A Color 400", tagline: "Saturated vignette") {
-                    $0.color.saturation *= 1.18
-                    $0.vignette.amount += 0.35
+                    $0.color.saturation *= 1.34
+                    $0.color.contrast *= 1.12
+                    $0.color.redBias *= 1.06
+                    $0.vignette.amount += 0.55
+                    $0.output.lightLeak = 0.2
                 },
                 authoredFilm(camera: camera, stock: velvia50, suffix: "xpro-slide", name: "X-Pro Slide", tagline: "Cross-processed punch") {
-                    $0.color.temperature += 0.1
-                    $0.color.cyanShift -= 0.16
-                    $0.color.yellowShift += 0.18
-                    $0.tone.p0.y += 0.04
+                    $0.color.temperature += 0.18
+                    $0.color.tint += 0.1
+                    $0.color.cyanShift -= 0.32
+                    $0.color.yellowShift += 0.34
+                    $0.color.saturation *= 1.24
+                    $0.tone.p0.y += 0.07
+                    $0.tone.p4.y = 0.91
                 },
                 authoredFilm(camera: camera, stock: ultramax400, suffix: "redscale", name: "Redscale", tagline: "Burnt orange experiment") {
-                    $0.color.temperature += 0.42
-                    $0.color.redBias *= 1.16
-                    $0.color.blueBias *= 0.72
-                    $0.tone.p4.y = 0.9
+                    $0.color.temperature += 0.64
+                    $0.color.redBias *= 1.3
+                    $0.color.greenBias *= 0.92
+                    $0.color.blueBias *= 0.5
+                    $0.color.saturation *= 1.16
+                    $0.tone.p0.y += 0.08
+                    $0.tone.p4.y = 0.82
                 },
                 authoredFilm(camera: camera, stock: ultramax400, suffix: "fisheye", name: "Fisheye Color", tagline: "Bulged lomo lens") {
-                    $0.lens.fisheye = 0.85
+                    $0.lens.fisheye = .diagonal(strength: 0.92, fieldOfView: 170, edgeDarkness: 0.75, edgeBlur: 0.24, chromaticEdge: 0.72)
                     $0.vignette.amount += 0.45
                     $0.aberration.amount += 0.35
+                    $0.output.lightLeak = 0.18
                 }
             ]
         case holga120N.id:
             return [
                 authoredFilm(camera: camera, stock: ultramax400, suffix: "holga-color", name: "Plastic Color", tagline: "Dreamy toy 120") {
-                    $0.lens.edgeSoftness += 0.16
-                    $0.vignette.amount += 0.28
+                    $0.lens.edgeSoftness += 0.28
+                    $0.lens.softness += 0.1
+                    $0.vignette.amount += 0.48
+                    $0.color.saturation *= 0.92
+                    $0.output.lightLeak = 0.32
                 },
                 authoredFilm(camera: camera, stock: triX400, suffix: "holga-mono", name: "Plastic Mono", tagline: "Soft square B&W") {
-                    $0.grain.amount += 0.16
-                    $0.vignette.amount += 0.22
+                    $0.grain.amount += 0.28
+                    $0.vignette.amount += 0.42
+                    $0.lens.softness += 0.16
+                    $0.tone.p0.y += 0.04
                 },
                 authoredFilm(camera: camera, stock: ultramax400, suffix: "holga-leak", name: "Light Leak Color", tagline: "Warm rough toy") {
-                    $0.halation.amount += 0.12
-                    $0.bloom.amount += 0.12
-                    $0.color.temperature += 0.18
+                    $0.halation.amount += 0.18
+                    $0.bloom.amount += 0.16
+                    $0.color.temperature += 0.28
+                    $0.color.redBias *= 1.12
+                    $0.output.lightLeak = 0.75
                 },
                 authoredFilm(camera: camera, stock: ultramax400, suffix: "holga-fisheye", name: "Fisheye Toy", tagline: "Rounded plastic bend") {
-                    $0.lens.fisheye = 0.75
+                    $0.lens.fisheye = .circular(cropped: true, strength: 0.95, fieldOfView: 170, imageCircle: 1.02, edgeDarkness: 0.95, edgeBlur: 0.48, chromaticEdge: 0.7)
                     $0.vignette.amount += 0.5
+                    $0.output.lightLeak = 0.28
                 }
             ]
         case dianaF.id:
             return [
                 authoredFilm(camera: camera, stock: ultramax400, suffix: "diana-dream", name: "Dream Color", tagline: "Soft low-fi colour") {
-                    $0.bloom.amount += 0.12
-                    $0.lens.softness += 0.12
+                    $0.bloom.amount += 0.22
+                    $0.lens.softness += 0.28
+                    $0.color.saturation *= 0.76
+                    $0.color.tint += 0.12
                 },
                 authoredFilm(camera: camera, stock: ektachromeE100, suffix: "diana-xpro", name: "Purple X-Pro", tagline: "Surreal slide cast") {
-                    $0.color.tint += 0.16
-                    $0.color.blueBias *= 1.12
-                    $0.vignette.amount += 0.25
+                    $0.color.tint += 0.32
+                    $0.color.blueBias *= 1.26
+                    $0.color.redBias *= 1.1
+                    $0.color.saturation *= 1.18
+                    $0.vignette.amount += 0.42
+                    $0.output.lightLeak = 0.22
                 },
                 authoredFilm(camera: camera, stock: ultramax400, suffix: "diana-fisheye", name: "Fisheye Dream", tagline: "Soft bent edges") {
-                    $0.lens.fisheye = 0.7
-                    $0.bloom.amount += 0.1
+                    $0.lens.fisheye = .circular(cropped: false, strength: 0.9, fieldOfView: 170, imageCircle: 0.92, edgeDarkness: 1.05, edgeBlur: 0.55, chromaticEdge: 0.78)
+                    $0.bloom.amount += 0.2
+                    $0.color.saturation *= 0.84
                 }
             ]
         case polaroidSX70.id:
@@ -338,76 +384,113 @@ enum ProfileCatalog {
         case disposableFlash.id:
             return [
                 authoredFilm(camera: camera, stock: ultramax400, suffix: "flash-party", name: "Flash Party", tagline: "Hard disposable flash") {
-                    $0.color.exposure += 0.12
-                    $0.vignette.amount += 0.12
-                    $0.output.flashFalloff = 0.75
+                    $0.color.exposure += 0.2
+                    $0.color.contrast *= 1.12
+                    $0.vignette.amount += 0.22
+                    $0.output.flashFalloff = 0.95
+                    $0.output.lightLeak = 0.16
                     $0.output.dateStamp = true
                 },
                 authoredFilm(camera: camera, stock: ultramax400, suffix: "beach-day", name: "Beach Day", tagline: "Cheap sun colour") {
-                    $0.color.saturation *= 1.12
-                    $0.color.temperature += 0.1
+                    $0.color.saturation *= 1.28
+                    $0.color.temperature += 0.2
+                    $0.tone.p4.y = 0.94
+                    $0.output.lightLeak = 0.22
                     $0.output.dateStamp = true
                 },
                 authoredFilm(camera: camera, stock: triX400, suffix: "flash-mono", name: "Flash Mono", tagline: "Point-blank B&W") {
-                    $0.color.contrast *= 1.2
-                    $0.grain.amount += 0.18
-                    $0.output.flashFalloff = 0.85
+                    $0.color.contrast *= 1.42
+                    $0.grain.amount += 0.3
+                    $0.output.flashFalloff = 1.0
                     $0.output.dateStamp = true
                 },
                 authoredFilm(camera: camera, stock: ultramax400, suffix: "fisheye-flash", name: "Fisheye Flash", tagline: "Skate mag bend") {
-                    $0.lens.fisheye = 0.8
+                    $0.lens.fisheye = .diagonal(strength: 0.98, fieldOfView: 175, edgeDarkness: 0.8, edgeBlur: 0.28, chromaticEdge: 0.86)
                     $0.vignette.amount += 0.35
-                    $0.output.flashFalloff = 0.8
+                    $0.output.flashFalloff = 0.95
+                    $0.output.lightLeak = 0.2
                     $0.output.dateStamp = true
                 }
             ]
         case canonG2.id:
             return [
                 authoredFilm(camera: camera, stock: digitalCCD, suffix: "warm-jpeg", name: "Warm JPEG", tagline: "Early compact colour") {
-                    $0.color.temperature += 0.08
-                    $0.lens.sharpen += 0.1
+                    $0.color.temperature += 0.18
+                    $0.color.contrast *= 1.12
+                    $0.lens.sharpen += 0.28
+                    $0.output.jpegCrunch = 0.34
+                    $0.output.chromaBleed = 0.18
                 },
                 authoredFilm(camera: camera, stock: digitalCCD, suffix: "office-flash", name: "Office Flash", tagline: "Brittle indoor CCD") {
-                    $0.color.exposure += 0.12
-                    $0.bloom.amount += 0.04
+                    $0.color.exposure += 0.2
+                    $0.color.temperature -= 0.08
+                    $0.color.tint -= 0.12
+                    $0.bloom.amount += 0.08
+                    $0.output.flashFalloff = 0.42
+                    $0.output.jpegCrunch = 0.42
+                    $0.output.chromaBleed = 0.26
                 },
                 authoredFilm(camera: camera, stock: digitalCCD, suffix: "low-res", name: "Low-res Web", tagline: "Downsampled upload") {
-                    $0.lens.downsample = 0.45
-                    $0.lens.sharpen += 0.3
+                    $0.lens.downsample = 0.36
+                    $0.lens.sharpen += 0.7
+                    $0.color.saturation *= 0.86
+                    $0.output.jpegCrunch = 0.82
+                    $0.output.chromaBleed = 0.34
                 }
             ]
         case sonyF707.id:
             return [
                 authoredFilm(camera: camera, stock: digitalCCD, suffix: "cyber-vivid", name: "Cyber Vivid", tagline: "Saturated CCD reds") {
-                    $0.color.saturation *= 1.18
-                    $0.aberration.amount += 0.35
+                    $0.color.saturation *= 1.38
+                    $0.color.redBias *= 1.12
+                    $0.color.blueBias *= 1.08
+                    $0.aberration.amount += 0.55
+                    $0.output.jpegCrunch = 0.28
+                    $0.output.chromaBleed = 0.26
                 },
                 authoredFilm(camera: camera, stock: digitalCCD, suffix: "purple-fringe", name: "Purple Fringe", tagline: "Hard highlight edges") {
-                    $0.color.tint += 0.08
-                    $0.aberration.amount += 0.65
+                    $0.color.tint += 0.2
+                    $0.color.contrast *= 1.16
+                    $0.aberration.amount += 1.05
+                    $0.output.jpegCrunch = 0.32
+                    $0.output.chromaBleed = 0.48
                 }
             ]
         case miniDVGrab.id:
             return [
                 authoredFilm(camera: camera, stock: digitalCCD, suffix: "tape-still", name: "Tape Still", tagline: "Video frame grab") {
-                    $0.lens.downsample = 0.38
-                    $0.color.contrast *= 1.1
+                    $0.lens.downsample = 0.32
+                    $0.color.contrast *= 1.26
+                    $0.color.saturation *= 1.22
+                    $0.output.jpegCrunch = 0.7
+                    $0.output.chromaBleed = 0.64
+                    $0.output.scanlines = 0.58
                 },
                 authoredFilm(camera: camera, stock: digitalCCD, suffix: "night-tape", name: "Night Tape", tagline: "Blue noisy camcorder") {
-                    $0.color.temperature -= 0.22
-                    $0.grain.amount += 0.28
-                    $0.bloom.amount += 0.08
+                    $0.color.temperature -= 0.38
+                    $0.color.tint -= 0.12
+                    $0.grain.amount += 0.42
+                    $0.bloom.amount += 0.12
+                    $0.output.jpegCrunch = 0.78
+                    $0.output.chromaBleed = 0.72
+                    $0.output.scanlines = 0.74
                 }
             ]
         case sonyMavicaFD.id:
             return [
                 authoredFilm(camera: camera, stock: digitalCCD, suffix: "floppy-640", name: "Floppy 640", tagline: "JPEG smear") {
-                    $0.lens.downsample = 0.26
-                    $0.lens.sharpen += 0.55
+                    $0.lens.downsample = 0.2
+                    $0.lens.sharpen += 0.9
+                    $0.output.jpegCrunch = 1.0
+                    $0.output.chromaBleed = 0.38
+                    $0.color.saturation *= 0.82
                 },
                 authoredFilm(camera: camera, stock: digitalCCD, suffix: "fine-mode", name: "Fine Mode", tagline: "Chunky early digital") {
-                    $0.lens.downsample = 0.34
-                    $0.color.saturation *= 0.9
+                    $0.lens.downsample = 0.28
+                    $0.color.saturation *= 0.88
+                    $0.color.contrast *= 1.18
+                    $0.output.jpegCrunch = 0.72
+                    $0.output.chromaBleed = 0.28
                 }
             ]
         case gameBoyCamera.id:
@@ -440,26 +523,38 @@ enum ProfileCatalog {
         case fxnR.id:
             return [
                 authoredFilm(camera: camera, stock: digitalCCD, suffix: "amber-cafe", name: "Amber Cafe", tagline: "Warm FXN interior") {
-                    $0.color.temperature += 0.42
-                    $0.color.redBias *= 1.08
-                    $0.color.yellowShift += 0.16
-                    $0.color.cyanShift -= 0.1
-                    $0.bloom.amount += 0.08
-                    $0.tone.p0.y += 0.04
+                    $0.color.temperature += 0.62
+                    $0.color.redBias *= 1.16
+                    $0.color.greenBias *= 0.98
+                    $0.color.blueBias *= 0.72
+                    $0.color.yellowShift += 0.28
+                    $0.color.cyanShift -= 0.18
+                    $0.bloom.amount += 0.16
+                    $0.halation.amount += 0.1
+                    $0.tone.p0.y += 0.08
+                    $0.output.jpegCrunch = 0.32
+                    $0.output.chromaBleed = 0.24
                     $0.output.labControlsEnabled = false
                 },
                 authoredFilm(camera: camera, stock: digitalCCD, suffix: "flash-wood", name: "Flash Wood", tagline: "Bright warm flash") {
-                    $0.color.exposure += 0.18
-                    $0.color.temperature += 0.36
-                    $0.halation.amount += 0.08
-                    $0.output.flashFalloff = 0.45
+                    $0.color.exposure += 0.28
+                    $0.color.temperature += 0.52
+                    $0.color.redBias *= 1.12
+                    $0.halation.amount += 0.14
+                    $0.output.flashFalloff = 0.68
+                    $0.output.jpegCrunch = 0.38
+                    $0.output.chromaBleed = 0.28
                 },
                 authoredFilm(camera: camera, stock: digitalCCD, suffix: "urban-night", name: "Urban Night", tagline: "Soft neon amber") {
-                    $0.color.temperature += 0.18
-                    $0.color.contrast *= 1.12
-                    $0.grain.amount += 0.18
-                    $0.bloom.amount += 0.12
-                    $0.tone.p0.y += 0.03
+                    $0.color.temperature += 0.3
+                    $0.color.tint += 0.08
+                    $0.color.contrast *= 1.22
+                    $0.color.saturation *= 1.22
+                    $0.grain.amount += 0.32
+                    $0.bloom.amount += 0.22
+                    $0.tone.p0.y += 0.06
+                    $0.output.jpegCrunch = 0.42
+                    $0.output.chromaBleed = 0.36
                 }
             ]
         default:
@@ -1302,7 +1397,11 @@ enum RecipeComposer {
                 posterizeLevels: max(camera.output.posterizeLevels, film.output.posterizeLevels),
                 dateStamp: camera.output.dateStamp || film.output.dateStamp,
                 flashFalloff: camera.output.flashFalloff + film.output.flashFalloff,
-                labControlsEnabled: camera.output.labControlsEnabled || film.output.labControlsEnabled
+                labControlsEnabled: camera.output.labControlsEnabled || film.output.labControlsEnabled,
+                jpegCrunch: camera.output.jpegCrunch + film.output.jpegCrunch,
+                chromaBleed: camera.output.chromaBleed + film.output.chromaBleed,
+                lightLeak: camera.output.lightLeak + film.output.lightLeak,
+                scanlines: camera.output.scanlines + film.output.scanlines
             ),
             aberration: camera.aberration,
             dust: DustRecipe(

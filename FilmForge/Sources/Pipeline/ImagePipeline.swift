@@ -53,6 +53,7 @@ final class ImagePipeline {
         GrainStage(),
         DustStage(),
         FlashFalloffStage(),
+        OutputProcessStage(),
         PaletteStage(),
         DateStampStage(),
         BorderStage()
@@ -408,24 +409,84 @@ struct LensStage: PipelineStage {
 }
 
 struct FisheyeStage: PipelineStage {
+    var backend: StageBackend { FilmKernelLibrary.fisheyeWarp == nil ? .builtInCoreImage : .customCoreImageKernel }
+
     func render(_ image: CIImage, context: RenderContext) throws -> CIImage {
-        let amount = context.profile.recipe.lens.fisheye * context.adjustments.intensity
-        guard amount > 0.001 else { return image }
+        let fisheye = context.profile.recipe.lens.fisheye
+        let amount = fisheye.strength * context.adjustments.intensity
+        guard fisheye.projection != .none, amount > 0.001 else { return image }
         let extent = image.extent
         let base = min(extent.width, extent.height)
+        let circle = clamped(fisheye.imageCircle, 0.55, 1.35)
+        let cropMode = fisheye.projection == .croppedCircular ? 1.0 : 0.0
 
-        let edgeMask = radialEdgeMask(extent: extent, inner: base * 0.26, outer: base * 0.62)
-        let softenedEdges = image
-            .applyingFilterIfAvailable("CIGaussianBlur", parameters: [
-                kCIInputRadiusKey: 1.0 + amount * 3.0
+        let warped: CIImage
+        if let kernel = FilmKernelLibrary.fisheyeWarp {
+            warped = kernel.apply(
+                extent: extent,
+                roiCallback: { _, rect in rect.insetBy(dx: -base * 0.16, dy: -base * 0.16) },
+                arguments: [extent.minX, extent.minY, extent.width, extent.height, min(amount, 1.2), circle, cropMode]
+            )?.cropped(to: extent) ?? fallbackFisheye(image, amount: amount)
+        } else {
+            warped = fallbackFisheye(image, amount: amount)
+        }
+
+        let edgeMask = radialEdgeMask(
+            extent: extent,
+            inner: base * CGFloat(max(0.2, circle * 0.36)),
+            outer: base * CGFloat(max(0.3, circle * 0.52))
+        )
+        var output = warped
+
+        if fisheye.edgeBlur > 0.001 {
+            let softened = warped.applyingFilterIfAvailable("CIGaussianBlur", parameters: [
+                kCIInputRadiusKey: 0.8 + fisheye.edgeBlur * amount * 5.5
             ])
-            .applyingFilterIfAvailable("CIBlendWithMask", parameters: [
-                "inputBackgroundImage": image,
+            output = softened.applyingFilterIfAvailable("CIBlendWithMask", parameters: [
+                "inputBackgroundImage": output,
                 "inputMaskImage": edgeMask
-            ])
-            .cropped(to: extent)
+            ]).cropped(to: extent)
+        }
 
-        let redEdge = softenedEdges
+        if fisheye.chromaticEdge > 0.001 {
+            output = fisheyeAberration(output, edgeMask: edgeMask, amount: fisheye.chromaticEdge * amount)
+        }
+
+        if fisheye.edgeDarkness > 0.001 {
+            output = output.applyingFilterIfAvailable("CIVignette", parameters: [
+                kCIInputIntensityKey: 1.05 * fisheye.edgeDarkness * amount,
+                kCIInputRadiusKey: base * CGFloat(max(0.32, circle * 0.44))
+            ]).cropped(to: extent)
+        }
+
+        if fisheye.projection == .circular || fisheye.projection == .croppedCircular {
+            let outside = constantColorImage(red: 0.006, green: 0.006, blue: 0.007, alpha: 1, extent: extent)
+            let radius = base * CGFloat(circle * (fisheye.projection == .croppedCircular ? 0.56 : 0.48))
+            let feather = base * CGFloat(max(0.015, fisheye.circleFeather))
+            let circleMask = radialEdgeMask(extent: extent, inner: max(1, radius - feather), outer: radius)
+                .applyingFilterIfAvailable("CIColorInvert", parameters: [:])
+            output = output.applyingFilterIfAvailable("CIBlendWithMask", parameters: [
+                "inputBackgroundImage": outside,
+                "inputMaskImage": circleMask
+            ]).cropped(to: extent)
+        }
+
+        return output.cropped(to: extent)
+    }
+
+    private func fallbackFisheye(_ image: CIImage, amount: Double) -> CIImage {
+        let extent = image.extent
+        let base = min(extent.width, extent.height)
+        return image.applyingFilterIfAvailable("CIBumpDistortion", parameters: [
+            kCIInputCenterKey: CIVector(x: extent.midX, y: extent.midY),
+            kCIInputRadiusKey: base * 0.78,
+            kCIInputScaleKey: 8 * min(amount, 1)
+        ]).cropped(to: extent)
+    }
+
+    private func fisheyeAberration(_ image: CIImage, edgeMask: CIImage, amount: Double) -> CIImage {
+        let extent = image.extent
+        let redEdge = image
             .transformed(by: CGAffineTransform(translationX: amount * 1.4, y: 0))
             .applyingFilterIfAvailable("CIColorMatrix", parameters: [
                 "inputRVector": CIVector(x: 1, y: 0, z: 0, w: 0),
@@ -434,7 +495,7 @@ struct FisheyeStage: PipelineStage {
                 "inputAVector": CIVector(x: 0, y: 0, z: 0, w: 0.16 * amount),
                 "inputBiasVector": CIVector(x: 0, y: 0, z: 0, w: 0)
             ])
-        let cyanEdge = softenedEdges
+        let cyanEdge = image
             .transformed(by: CGAffineTransform(translationX: -amount * 1.2, y: 0))
             .applyingFilterIfAvailable("CIColorMatrix", parameters: [
                 "inputRVector": CIVector(x: 0, y: 0, z: 0, w: 0),
@@ -447,17 +508,15 @@ struct FisheyeStage: PipelineStage {
         let aberrated = cyanEdge
             .applyingFilterIfAvailable("CIScreenBlendMode", parameters: [
                 "inputBackgroundImage": redEdge.applyingFilterIfAvailable("CIScreenBlendMode", parameters: [
-                    "inputBackgroundImage": softenedEdges
+                    "inputBackgroundImage": image
                 ])
             ])
             .cropped(to: extent)
 
-        let darkened = aberrated.applyingFilterIfAvailable("CIVignette", parameters: [
-            kCIInputIntensityKey: 1.25 * amount,
-            kCIInputRadiusKey: base * 0.46
+        return aberrated.applyingFilterIfAvailable("CIBlendWithMask", parameters: [
+            "inputBackgroundImage": image,
+            "inputMaskImage": edgeMask
         ]).cropped(to: extent)
-
-        return mix(image, with: darkened, amount: min(0.85, 0.45 + amount * 0.35))
     }
 }
 
@@ -615,6 +674,94 @@ struct FlashFalloffStage: PipelineStage {
             "inputBackgroundImage": image,
             "inputMaskImage": centerMask.applyingFilterIfAvailable("CIColorInvert", parameters: [:])
         ]).cropped(to: extent)
+    }
+}
+
+struct OutputProcessStage: PipelineStage {
+    func render(_ image: CIImage, context: RenderContext) throws -> CIImage {
+        let output = context.profile.recipe.output
+        let intensity = context.adjustments.intensity
+        var current = image
+        let extent = image.extent
+
+        let crunch = output.jpegCrunch * intensity
+        if crunch > 0.001 {
+            let scale = CGFloat(clamped(1 - crunch * 0.42, 0.32, 1))
+            let small = current.transformed(by: CGAffineTransform(scaleX: scale, y: scale))
+            current = small
+                .transformed(by: CGAffineTransform(scaleX: 1 / scale, y: 1 / scale))
+                .cropped(to: extent)
+                .applyingFilterIfAvailable("CIColorPosterize", parameters: [
+                    "inputLevels": clamped(18 - crunch * 8, 6, 18)
+                ])
+                .applyingFilterIfAvailable("CISharpenLuminance", parameters: [
+                    kCIInputSharpnessKey: 0.35 + crunch * 1.2
+                ])
+                .cropped(to: extent)
+        }
+
+        let bleed = output.chromaBleed * intensity
+        if bleed > 0.001 {
+            let color = current
+                .applyingFilterIfAvailable("CIGaussianBlur", parameters: [
+                    kCIInputRadiusKey: 1.2 + bleed * 4.0
+                ])
+                .applyingFilterIfAvailable("CIColorControls", parameters: [
+                    kCIInputSaturationKey: 1.35 + bleed * 0.8,
+                    kCIInputBrightnessKey: 0,
+                    kCIInputContrastKey: 0.92
+                ])
+                .transformed(by: CGAffineTransform(translationX: bleed * 2.0, y: 0))
+            current = mix(current, with: color.cropped(to: extent), amount: min(0.22, bleed * 0.16))
+        }
+
+        let leak = output.lightLeak * intensity
+        if leak > 0.001 {
+            let side = constantColorImage(red: 1, green: 0.45, blue: 0.14, alpha: min(0.28, leak * 0.18), extent: extent)
+            let mask = linearLeakMask(extent: extent, seed: Int(context.renderSeed))
+            current = side.applyingFilterIfAvailable("CIScreenBlendMode", parameters: [
+                "inputBackgroundImage": current
+            ]).applyingFilterIfAvailable("CIBlendWithMask", parameters: [
+                "inputBackgroundImage": current,
+                "inputMaskImage": mask
+            ]).cropped(to: extent)
+        }
+
+        let scanlines = output.scanlines * intensity
+        if scanlines > 0.001 {
+            let lineImage = scanlineMask(extent: extent, opacity: min(0.18, scanlines * 0.12))
+            current = lineImage.applyingFilterIfAvailable("CIMultiplyBlendMode", parameters: [
+                "inputBackgroundImage": current
+            ]).cropped(to: extent)
+        }
+
+        return current.cropped(to: extent)
+    }
+
+    private func linearLeakMask(extent: CGRect, seed: Int) -> CIImage {
+        let leftSide = seed % 2 == 0
+        let startX = leftSide ? extent.minX : extent.maxX
+        let endX = leftSide ? extent.minX + extent.width * 0.58 : extent.maxX - extent.width * 0.58
+        guard let filter = CIFilter(name: "CILinearGradient") else {
+            return constantColorImage(red: 1, green: 1, blue: 1, alpha: 1, extent: extent)
+        }
+        filter.setValue(CIVector(x: startX, y: extent.midY), forKey: "inputPoint0")
+        filter.setValue(CIVector(x: endX, y: extent.midY), forKey: "inputPoint1")
+        filter.setValue(CIColor(red: 1, green: 1, blue: 1, alpha: 1), forKey: "inputColor0")
+        filter.setValue(CIColor(red: 0, green: 0, blue: 0, alpha: 1), forKey: "inputColor1")
+        return (filter.outputImage ?? CIImage.empty()).cropped(to: extent)
+    }
+
+    private func scanlineMask(extent: CGRect, opacity: Double) -> CIImage {
+        let stripe = CIFilter(name: "CIStripesGenerator")
+        stripe?.setValue(CIVector(x: extent.minX, y: extent.minY), forKey: "inputCenter")
+        stripe?.setValue(CIColor(red: 1 - opacity, green: 1 - opacity, blue: 1 - opacity, alpha: 1), forKey: "inputColor0")
+        stripe?.setValue(CIColor(red: 1, green: 1, blue: 1, alpha: 1), forKey: "inputColor1")
+        stripe?.setValue(1.0, forKey: "inputWidth")
+        stripe?.setValue(3.0, forKey: "inputSharpness")
+        return (stripe?.outputImage ?? constantColorImage(red: 1, green: 1, blue: 1, alpha: 1, extent: extent))
+            .transformed(by: CGAffineTransform(rotationAngle: .pi / 2))
+            .cropped(to: extent)
     }
 }
 

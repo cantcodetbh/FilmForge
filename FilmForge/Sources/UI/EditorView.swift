@@ -417,8 +417,27 @@ private struct ModeSignatureCard: View {
         if recipe.output.dateStamp {
             values.append("date stamp")
         }
-        if recipe.lens.fisheye > 0.01 {
-            values.append("fisheye")
+        if recipe.output.jpegCrunch > 0.4 {
+            values.append("jpeg crunch")
+        }
+        if recipe.output.chromaBleed > 0.35 {
+            values.append("chroma bleed")
+        }
+        if recipe.output.lightLeak > 0.2 {
+            values.append("light leak")
+        }
+        if recipe.output.scanlines > 0.2 {
+            values.append("scanlines")
+        }
+        switch recipe.lens.fisheye.projection {
+        case .none:
+            break
+        case .diagonal:
+            values.append("full fisheye")
+        case .circular:
+            values.append("circle fisheye")
+        case .croppedCircular:
+            values.append("cropped fisheye")
         }
         if recipe.grain.amount > 0.55 {
             values.append("heavy grain")

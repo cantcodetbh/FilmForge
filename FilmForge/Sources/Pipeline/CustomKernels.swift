@@ -2,6 +2,35 @@ import CoreImage
 import Foundation
 
 enum FilmKernelLibrary {
+    static let fisheyeWarp: CIWarpKernel? = CIWarpKernel(source:
+        """
+        kernel vec2 fisheyeWarp(float minX, float minY, float width, float height, float strength, float imageCircle, float cropMode) {
+            vec2 coord = destCoord();
+            vec2 center = vec2(minX + width * 0.5, minY + height * 0.5);
+            vec2 size = vec2(width, height);
+            float base = min(size.x, size.y);
+            vec2 p = (coord - center) / (base * 0.5);
+            float radius = length(p);
+            if (radius < 0.0001) {
+                return coord;
+            }
+
+            float circle = max(imageCircle, 0.25);
+            float normalizedRadius = radius / circle;
+            float bounded = clamp(normalizedRadius, 0.0, 1.65);
+            float sourceRadius = tan(bounded * 0.98) / tan(0.98);
+            sourceRadius = mix(normalizedRadius, sourceRadius, clamp(strength, 0.0, 1.2));
+
+            if (cropMode > 0.5) {
+                sourceRadius *= 0.84;
+            }
+
+            vec2 source = center + normalize(p) * sourceRadius * circle * base * 0.5;
+            return source;
+        }
+        """
+    )
+
     static let filmicResponse: CIColorKernel? = {
         metalColorKernel(named: "filmicResponse") ?? CIColorKernel(source:
             """
