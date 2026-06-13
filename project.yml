@@ -1,0 +1,30 @@
+name: FilmForge
+options:
+  bundleIdPrefix: com.filmforge
+  deploymentTarget:
+    macOS: "14.0"
+  createIntermediateGroups: true
+settings:
+  base:
+    SWIFT_VERSION: "6.0"
+    MACOSX_DEPLOYMENT_TARGET: "14.0"
+targets:
+  FilmForge:
+    type: application
+    platform: macOS
+    sources:
+      - path: FilmForge/Sources
+      - path: FilmForge/Resources
+    settings:
+      base:
+        PRODUCT_BUNDLE_IDENTIFIER: com.filmforge.app
+        PRODUCT_NAME: FilmForge
+        GENERATE_INFOPLIST_FILE: YES
+        INFOPLIST_KEY_CFBundleDisplayName: FilmForge
+        INFOPLIST_KEY_LSApplicationCategoryType: public.app-category.photography
+        INFOPLIST_KEY_NSHumanReadableCopyright: "Copyright © 2026 FilmForge"
+        ENABLE_HARDENED_RUNTIME: YES
+        CODE_SIGN_STYLE: Automatic
+        DEVELOPMENT_TEAM: ""
+    scheme:
+      testTargets: []
