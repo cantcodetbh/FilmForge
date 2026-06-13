@@ -302,16 +302,19 @@ enum ProfileCatalog {
                 authoredFilm(camera: camera, stock: instantColor, suffix: "sx70-color", name: "SX-70 Color", tagline: "Slow warm instant") {
                     $0.color.temperature += 0.12
                     $0.tone.p0.y += 0.04
+                    $0.output.aspect = .instant
                 },
                 authoredFilm(camera: camera, stock: instantColor, suffix: "sx70-expired", name: "Expired SX-70", tagline: "Faded chemistry") {
                     $0.color.saturation *= 0.78
                     $0.tone.p0.y += 0.08
                     $0.dust.amount += 0.04
+                    $0.output.aspect = .instant
                 },
                 authoredFilm(camera: camera, stock: triX400, suffix: "sx70-bw", name: "SX-70 B&W", tagline: "Soft instant mono") {
                     $0.color.monochrome = true
                     $0.color.saturation = 0
                     $0.border.style = .instant
+                    $0.output.aspect = .instant
                 }
             ]
         case fujiNaturaClassica.id:
@@ -337,18 +340,25 @@ enum ProfileCatalog {
                 authoredFilm(camera: camera, stock: ultramax400, suffix: "flash-party", name: "Flash Party", tagline: "Hard disposable flash") {
                     $0.color.exposure += 0.12
                     $0.vignette.amount += 0.12
+                    $0.output.flashFalloff = 0.75
+                    $0.output.dateStamp = true
                 },
                 authoredFilm(camera: camera, stock: ultramax400, suffix: "beach-day", name: "Beach Day", tagline: "Cheap sun colour") {
                     $0.color.saturation *= 1.12
                     $0.color.temperature += 0.1
+                    $0.output.dateStamp = true
                 },
                 authoredFilm(camera: camera, stock: triX400, suffix: "flash-mono", name: "Flash Mono", tagline: "Point-blank B&W") {
                     $0.color.contrast *= 1.2
                     $0.grain.amount += 0.18
+                    $0.output.flashFalloff = 0.85
+                    $0.output.dateStamp = true
                 },
                 authoredFilm(camera: camera, stock: ultramax400, suffix: "fisheye-flash", name: "Fisheye Flash", tagline: "Skate mag bend") {
                     $0.lens.fisheye = 0.8
                     $0.vignette.amount += 0.35
+                    $0.output.flashFalloff = 0.8
+                    $0.output.dateStamp = true
                 }
             ]
         case canonG2.id:
@@ -408,17 +418,23 @@ enum ProfileCatalog {
                     $0.lens.downsample = 0.18
                     $0.lens.sharpen += 0.9
                     $0.border.style = .thin
+                    $0.output.palette = .gameBoyGreen
+                    $0.output.posterizeLevels = 4
                 },
                 authoredFilm(camera: camera, stock: digitalCCD, suffix: "pocket-mono", name: "Pocket Mono", tagline: "Harsh dither B&W") {
                     $0.color.monochrome = true
                     $0.color.contrast *= 1.5
                     $0.lens.downsample = 0.16
+                    $0.output.palette = .hardMono
+                    $0.output.posterizeLevels = 4
                 },
                 authoredFilm(camera: camera, stock: digitalCCD, suffix: "thermal-print", name: "Thermal Print", tagline: "Washed tiny print") {
                     $0.color.monochrome = true
                     $0.tone.p0.y += 0.16
                     $0.tone.p4.y = 0.82
                     $0.lens.downsample = 0.14
+                    $0.output.palette = .thermal
+                    $0.output.posterizeLevels = 5
                 }
             ]
         case fxnR.id:
@@ -426,18 +442,24 @@ enum ProfileCatalog {
                 authoredFilm(camera: camera, stock: digitalCCD, suffix: "amber-cafe", name: "Amber Cafe", tagline: "Warm FXN interior") {
                     $0.color.temperature += 0.42
                     $0.color.redBias *= 1.08
+                    $0.color.yellowShift += 0.16
+                    $0.color.cyanShift -= 0.1
                     $0.bloom.amount += 0.08
+                    $0.tone.p0.y += 0.04
+                    $0.output.labControlsEnabled = false
                 },
                 authoredFilm(camera: camera, stock: digitalCCD, suffix: "flash-wood", name: "Flash Wood", tagline: "Bright warm flash") {
                     $0.color.exposure += 0.18
                     $0.color.temperature += 0.36
                     $0.halation.amount += 0.08
+                    $0.output.flashFalloff = 0.45
                 },
                 authoredFilm(camera: camera, stock: digitalCCD, suffix: "urban-night", name: "Urban Night", tagline: "Soft neon amber") {
                     $0.color.temperature += 0.18
                     $0.color.contrast *= 1.12
                     $0.grain.amount += 0.18
                     $0.bloom.amount += 0.12
+                    $0.tone.p0.y += 0.03
                 }
             ]
         default:
@@ -1079,6 +1101,8 @@ enum ProfileCatalog {
         edit: (inout FilmRecipe) -> Void
     ) -> FilmStock {
         var recipe = RecipeComposer.combine(camera.recipe, stock.recipe)
+        recipe.output.aspect = defaultAspect(for: camera)
+        recipe.output.labControlsEnabled = false
         edit(&recipe)
         return FilmStock(
             id: "\(camera.id)-\(suffix)",
@@ -1095,6 +1119,19 @@ enum ProfileCatalog {
             recipe: recipe,
             behavior: .completeProfile
         )
+    }
+
+    private static func defaultAspect(for camera: CameraProfile) -> OutputRecipe.Aspect {
+        switch camera.format {
+        case .thirtyFive, .disposable, .toy:
+            .threeByTwo
+        case .medium120, .instant:
+            .square
+        case .halfFrame:
+            .halfFrame
+        case .ccd:
+            .original
+        }
     }
 
     private static func cameraRecipe(
@@ -1259,6 +1296,14 @@ enum RecipeComposer {
                 softness: (camera.vignette.softness + film.vignette.softness) / 2
             ),
             lens: camera.lens,
+            output: OutputRecipe(
+                aspect: camera.output.aspect == .original ? film.output.aspect : camera.output.aspect,
+                palette: film.output.palette == .natural ? camera.output.palette : film.output.palette,
+                posterizeLevels: max(camera.output.posterizeLevels, film.output.posterizeLevels),
+                dateStamp: camera.output.dateStamp || film.output.dateStamp,
+                flashFalloff: camera.output.flashFalloff + film.output.flashFalloff,
+                labControlsEnabled: camera.output.labControlsEnabled || film.output.labControlsEnabled
+            ),
             aberration: camera.aberration,
             dust: DustRecipe(
                 amount: camera.dust.amount + film.dust.amount,

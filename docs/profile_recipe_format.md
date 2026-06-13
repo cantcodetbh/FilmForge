@@ -34,6 +34,7 @@ FilmForge profiles are composed from a camera recipe plus a film recipe.
 - `halation`
 - `vignette`
 - `lens`
+- `output`
 - `aberration`
 - `dust`
 - `border`
@@ -77,6 +78,19 @@ Examples:
 - `Game Boy Camera / DMG Green` is a camera media mode, not a film stock.
 - `FXN R / Amber Cafe` is an app-camera inspired digital mode.
 - Fisheye options exist only on camera identities where that lens behavior feels plausible: Lomo/toy/disposable style profiles.
+
+## Output Recipe
+
+`OutputRecipe` makes the app feel more like a camera than a generic editor. A mode can declare:
+
+- Aspect/crop behavior: original, 3:2, square, half-frame, instant.
+- Palette behavior: natural, Game Boy green, hard mono, thermal.
+- Posterization level for low-bit digital/toy looks.
+- Date stamp for disposable/digicam modes.
+- Flash falloff for disposable and flash-forward looks.
+- Whether Lab controls should open by default.
+
+The UI now keeps Lab sliders closed by default. The main flow is camera-first: pick a camera, pick its authored film/mode, and treat the result as the camera output. Sliders remain available as an optional Lab drawer.
 
 ## Fallback Composition Rules
 

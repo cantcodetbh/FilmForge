@@ -21,6 +21,7 @@ final class EditorViewModel: ObservableObject {
     @Published var showingOriginal = false
     @Published var isRendering = false
     @Published var isExporting = false
+    @Published var showLabControls = false
     @Published var exportFormat: ExportFormat = .jpeg
     @Published var statusMessage = "Import a photo to begin."
     @Published var errorMessage: String?
@@ -152,6 +153,7 @@ final class EditorViewModel: ObservableObject {
 
     private func profileChanged() {
         adjustments = selectedProfile.defaultAdjustments
+        showLabControls = selectedProfile.recipe.output.labControlsEnabled
         schedulePreviewRender()
     }
 

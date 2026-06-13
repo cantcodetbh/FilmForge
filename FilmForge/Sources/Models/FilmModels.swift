@@ -75,6 +75,7 @@ struct FilmRecipe: Hashable, Sendable {
     var halation: HalationRecipe
     var vignette: VignetteRecipe
     var lens: LensRecipe
+    var output: OutputRecipe = .neutral
     var aberration: AberrationRecipe
     var dust: DustRecipe
     var border: BorderRecipe
@@ -190,6 +191,32 @@ struct LensRecipe: Hashable, Sendable {
     var fisheye: Double = 0
 }
 
+struct OutputRecipe: Hashable, Sendable {
+    enum Aspect: String, Hashable, Sendable {
+        case original
+        case threeByTwo
+        case square
+        case halfFrame
+        case instant
+    }
+
+    enum Palette: String, Hashable, Sendable {
+        case natural
+        case gameBoyGreen
+        case hardMono
+        case thermal
+    }
+
+    var aspect: Aspect = .original
+    var palette: Palette = .natural
+    var posterizeLevels: Double = 0
+    var dateStamp: Bool = false
+    var flashFalloff: Double = 0
+    var labControlsEnabled: Bool = false
+
+    static let neutral = OutputRecipe()
+}
+
 struct AberrationRecipe: Hashable, Sendable {
     var amount: Double
 }
@@ -238,6 +265,7 @@ extension FilmRecipe {
         halation: HalationRecipe(amount: 0, radius: 8, warmth: 1),
         vignette: VignetteRecipe(amount: 0, radius: 1, softness: 0.5),
         lens: LensRecipe(softness: 0, edgeSoftness: 0, sharpen: 0, downsample: 1),
+        output: .neutral,
         aberration: AberrationRecipe(amount: 0),
         dust: DustRecipe(amount: 0, scratches: 0),
         border: BorderRecipe(style: .none, amount: 0)

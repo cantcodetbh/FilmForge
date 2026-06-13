@@ -1,3 +1,4 @@
+import AppKit
 import CoreGraphics
 import CoreImage
 import Foundation
@@ -35,6 +36,7 @@ extension MetalStage {
 final class ImagePipeline {
     private let stages: [PipelineStage] = [
         PreviewSizingStage(),
+        AspectCropStage(),
         DownsampleStage(),
         ExposureTemperatureStage(),
         LUTStage(),
@@ -50,6 +52,9 @@ final class ImagePipeline {
         VignetteStage(),
         GrainStage(),
         DustStage(),
+        FlashFalloffStage(),
+        PaletteStage(),
+        DateStampStage(),
         BorderStage()
     ]
 
@@ -68,6 +73,36 @@ struct PreviewSizingStage: PipelineStage {
         guard longEdge > maxLongEdge, maxLongEdge > 0 else { return image }
         let scale = maxLongEdge / longEdge
         return image.transformed(by: CGAffineTransform(scaleX: scale, y: scale))
+    }
+}
+
+struct AspectCropStage: PipelineStage {
+    func render(_ image: CIImage, context: RenderContext) throws -> CIImage {
+        let aspect = context.profile.recipe.output.aspect
+        guard aspect != .original else { return image }
+        let targetRatio: CGFloat
+        switch aspect {
+        case .original:
+            return image
+        case .threeByTwo:
+            targetRatio = 3 / 2
+        case .square, .instant:
+            targetRatio = 1
+        case .halfFrame:
+            targetRatio = 2 / 3
+        }
+
+        let extent = image.extent.integral
+        let currentRatio = extent.width / extent.height
+        let crop: CGRect
+        if currentRatio > targetRatio {
+            let width = extent.height * targetRatio
+            crop = CGRect(x: extent.midX - width / 2, y: extent.minY, width: width, height: extent.height)
+        } else {
+            let height = extent.width / targetRatio
+            crop = CGRect(x: extent.minX, y: extent.midY - height / 2, width: extent.width, height: height)
+        }
+        return image.cropped(to: crop.integral).transformed(by: CGAffineTransform(translationX: -crop.minX, y: -crop.minY))
     }
 }
 
@@ -529,6 +564,126 @@ struct DustStage: PipelineStage {
         return dust.applyingFilterIfAvailable("CIScreenBlendMode", parameters: [
             "inputBackgroundImage": image
         ]).cropped(to: extent)
+    }
+}
+
+struct FlashFalloffStage: PipelineStage {
+    func render(_ image: CIImage, context: RenderContext) throws -> CIImage {
+        let amount = context.profile.recipe.output.flashFalloff * context.adjustments.intensity
+        guard amount > 0.001 else { return image }
+        let extent = image.extent
+        let base = min(extent.width, extent.height)
+        let centerMask = radialEdgeMask(extent: extent, inner: base * 0.08, outer: base * 0.72)
+        let flash = image
+            .applyingFilterIfAvailable("CIExposureAdjust", parameters: [kCIInputEVKey: 0.5 * amount])
+            .applyingFilterIfAvailable("CIColorMatrix", parameters: [
+                "inputRVector": CIVector(x: 1 + 0.08 * amount, y: 0, z: 0, w: 0),
+                "inputGVector": CIVector(x: 0, y: 1 + 0.02 * amount, z: 0, w: 0),
+                "inputBVector": CIVector(x: 0, y: 0, z: 1 - 0.08 * amount, w: 0),
+                "inputAVector": CIVector(x: 0, y: 0, z: 0, w: 1),
+                "inputBiasVector": CIVector(x: 0, y: 0, z: 0, w: 0)
+            ])
+        return flash.applyingFilterIfAvailable("CIBlendWithMask", parameters: [
+            "inputBackgroundImage": image,
+            "inputMaskImage": centerMask.applyingFilterIfAvailable("CIColorInvert", parameters: [:])
+        ]).cropped(to: extent)
+    }
+}
+
+struct PaletteStage: PipelineStage {
+    func render(_ image: CIImage, context: RenderContext) throws -> CIImage {
+        let output = context.profile.recipe.output
+        var current = image
+
+        if output.posterizeLevels > 1 {
+            current = current.applyingFilterIfAvailable("CIColorPosterize", parameters: [
+                "inputLevels": output.posterizeLevels
+            ])
+        }
+
+        switch output.palette {
+        case .natural:
+            return current
+        case .gameBoyGreen:
+            let mono = current.applyingFilterIfAvailable("CIPhotoEffectMono", parameters: [:])
+            return mono.applyingFilterIfAvailable("CIColorMatrix", parameters: [
+                "inputRVector": CIVector(x: 0.42, y: 0, z: 0, w: 0),
+                "inputGVector": CIVector(x: 0, y: 0.78, z: 0, w: 0),
+                "inputBVector": CIVector(x: 0, y: 0, z: 0.28, w: 0),
+                "inputAVector": CIVector(x: 0, y: 0, z: 0, w: 1),
+                "inputBiasVector": CIVector(x: 0.08, y: 0.12, z: 0.04, w: 0)
+            ]).cropped(to: image.extent)
+        case .hardMono:
+            return current
+                .applyingFilterIfAvailable("CIPhotoEffectNoir", parameters: [:])
+                .applyingFilterIfAvailable("CIColorControls", parameters: [
+                    kCIInputSaturationKey: 0,
+                    kCIInputBrightnessKey: -0.02,
+                    kCIInputContrastKey: 1.5
+                ])
+                .cropped(to: image.extent)
+        case .thermal:
+            return current
+                .applyingFilterIfAvailable("CIPhotoEffectMono", parameters: [:])
+                .applyingFilterIfAvailable("CIColorControls", parameters: [
+                    kCIInputSaturationKey: 0,
+                    kCIInputBrightnessKey: 0.12,
+                    kCIInputContrastKey: 0.72
+                ])
+                .cropped(to: image.extent)
+        }
+    }
+}
+
+struct DateStampStage: PipelineStage {
+    func render(_ image: CIImage, context: RenderContext) throws -> CIImage {
+        guard context.profile.recipe.output.dateStamp else { return image }
+        let extent = image.extent.integral
+        let formatter = DateFormatter()
+        formatter.dateFormat = "yy  MM dd"
+        let text = formatter.string(from: Date())
+        let fontSize = max(18, min(extent.width, extent.height) * 0.035)
+        guard let stamp = makeStamp(text: text, fontSize: fontSize) else { return image }
+
+        let scale = fontSize / 28
+        let stampImage = stamp
+            .transformed(by: CGAffineTransform(scaleX: scale, y: scale))
+            .applyingFilterIfAvailable("CIColorMatrix", parameters: [
+                "inputRVector": CIVector(x: 1.0, y: 0, z: 0, w: 0),
+                "inputGVector": CIVector(x: 0, y: 0.72, z: 0, w: 0),
+                "inputBVector": CIVector(x: 0, y: 0, z: 0.08, w: 0),
+                "inputAVector": CIVector(x: 0, y: 0, z: 0, w: 0.86),
+                "inputBiasVector": CIVector(x: 0.08, y: 0.02, z: 0, w: 0)
+            ])
+
+        let margin = max(16, min(extent.width, extent.height) * 0.035)
+        let placed = stampImage.transformed(by: CGAffineTransform(
+            translationX: extent.maxX - stampImage.extent.width - margin,
+            y: extent.minY + margin
+        ))
+        return placed.applyingFilterIfAvailable("CISourceOverCompositing", parameters: [
+            "inputBackgroundImage": image
+        ]).cropped(to: extent)
+    }
+
+    private func makeStamp(text: String, fontSize: CGFloat) -> CIImage? {
+        let attributes: [NSAttributedString.Key: Any] = [
+            .font: NSFont.monospacedDigitSystemFont(ofSize: 28, weight: .semibold),
+            .foregroundColor: NSColor.white
+        ]
+        let string = NSAttributedString(string: text, attributes: attributes)
+        let size = string.size()
+        let image = NSImage(size: NSSize(width: size.width + 10, height: size.height + 8))
+        image.lockFocus()
+        NSColor.clear.setFill()
+        NSRect(origin: .zero, size: image.size).fill()
+        string.draw(at: NSPoint(x: 5, y: 4))
+        image.unlockFocus()
+        guard let tiff = image.tiffRepresentation,
+              let bitmap = NSBitmapImageRep(data: tiff),
+              let cgImage = bitmap.cgImage
+        else { return nil }
+        return CIImage(cgImage: cgImage)
     }
 }
 

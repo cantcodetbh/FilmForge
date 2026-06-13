@@ -82,13 +82,18 @@ Future improvement:
 
 Current implementation:
 
+- Profile-owned aspect/crop output before effects.
 - Downsample/re-upsample for toy/low-fi capture.
 - General softness.
 - Edge-only softness mask.
 - Mild barrel-style distortion for cheap/toy optics.
 - Edge-weighted chromatic aberration.
+- Optional fisheye accessory for authored toy/disposable modes.
 - Vignette.
 - Dust and scratches.
+- Optional flash falloff.
+- Optional disposable-style date stamp.
+- Optional posterized/palette output for toy digital modes.
 - Borders for instant, print, thin, and half-frame styles.
 
 Future improvement:
@@ -108,7 +113,8 @@ Current behavior:
 - Preview is rendered separately.
 - Full-res export reruns the pipeline.
 - Profile changes do not mutate the image.
-- Adjustments can reset to profile defaults.
+- Camera/mode output is primary.
+- Lab adjustments are hidden by default and can reset to profile defaults.
 
 Future behavior:
 
@@ -116,4 +122,3 @@ Future behavior:
 - Split-view compare.
 - Export cancellation/progress.
 - Background batch export.
-

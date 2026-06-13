@@ -257,43 +257,74 @@ private struct InspectorView: View {
         VStack(alignment: .leading, spacing: 0) {
             HStack {
                 VStack(alignment: .leading, spacing: 4) {
-                    Text("Recipe Controls")
+                    Text("Camera Mode")
                         .font(.headline)
-                    Text("Tuning scales the selected camera mode.")
+                    Text("Choose the look. The Lab is optional.")
                         .font(.caption)
                         .foregroundStyle(.white.opacity(0.52))
                 }
                 Spacer()
-                Button {
-                    editor.resetAdjustments()
-                } label: {
-                    Image(systemName: "arrow.counterclockwise")
-                }
-                .help("Reset controls")
             }
             .padding(18)
 
             ScrollView {
                 VStack(spacing: 16) {
                     FilmPicker()
-                    SliderRow(title: "Intensity", systemImage: "dial.high", value: $editor.adjustments.intensity, range: 0...1.4, format: .percent)
-                    SliderRow(title: "Exposure", systemImage: "plusminus.circle", value: $editor.adjustments.exposure, range: -1.5...1.5, format: .signedDecimal)
-                    SliderRow(title: "Temperature", systemImage: "thermometer.sun", value: $editor.adjustments.temperature, range: -1...1, format: .signedDecimal)
-                    SliderRow(title: "Tint", systemImage: "eyedropper.halffull", value: $editor.adjustments.tint, range: -1...1, format: .signedDecimal)
-                    SliderRow(title: "Grain", systemImage: "circle.grid.cross", value: $editor.adjustments.grain, range: 0...2, format: .percent)
-                    SliderRow(title: "Bloom", systemImage: "sparkle.magnifyingglass", value: $editor.adjustments.bloom, range: 0...2, format: .percent)
-                    SliderRow(title: "Halation", systemImage: "sun.max", value: $editor.adjustments.halation, range: 0...2, format: .percent)
-                    SliderRow(title: "Vignette", systemImage: "circle.dashed", value: $editor.adjustments.vignette, range: 0...2, format: .percent)
-                    SliderRow(title: "Fade", systemImage: "shadow", value: $editor.adjustments.fade, range: 0...1, format: .percent)
-                    SliderRow(title: "Softness", systemImage: "camera.aperture", value: $editor.adjustments.softness, range: 0...2, format: .percent)
-                    SliderRow(title: "Dust", systemImage: "wand.and.stars", value: $editor.adjustments.dust, range: 0...2, format: .percent)
+                    ModeSignatureCard(profile: editor.selectedProfile)
 
-                    Toggle(isOn: $editor.adjustments.borderEnabled) {
-                        Label("Border", systemImage: "rectangle.inset.filled")
+                    Button {
+                        withAnimation(.snappy(duration: 0.18)) {
+                            editor.showLabControls.toggle()
+                        }
+                    } label: {
+                        HStack {
+                            Label(editor.showLabControls ? "Hide Lab" : "Open Lab", systemImage: "slider.horizontal.3")
+                            Spacer()
+                            Image(systemName: editor.showLabControls ? "chevron.up" : "chevron.down")
+                                .font(.caption.weight(.bold))
+                        }
                     }
-                    .toggleStyle(.switch)
+                    .buttonStyle(.plain)
                     .padding(12)
                     .background(Color.white.opacity(0.045), in: RoundedRectangle(cornerRadius: 8))
+
+                    if editor.showLabControls {
+                        VStack(spacing: 16) {
+                            HStack {
+                                Text("Lab Adjustments")
+                                    .font(.subheadline.weight(.semibold))
+                                Spacer()
+                                Button {
+                                    editor.resetAdjustments()
+                                } label: {
+                                    Label("Reset", systemImage: "arrow.counterclockwise")
+                                }
+                                .labelStyle(.iconOnly)
+                                .help("Reset controls")
+                            }
+                            .padding(.horizontal, 2)
+
+                            SliderRow(title: "Intensity", systemImage: "dial.high", value: $editor.adjustments.intensity, range: 0...1.4, format: .percent)
+                            SliderRow(title: "Exposure", systemImage: "plusminus.circle", value: $editor.adjustments.exposure, range: -1.5...1.5, format: .signedDecimal)
+                            SliderRow(title: "Temperature", systemImage: "thermometer.sun", value: $editor.adjustments.temperature, range: -1...1, format: .signedDecimal)
+                            SliderRow(title: "Tint", systemImage: "eyedropper.halffull", value: $editor.adjustments.tint, range: -1...1, format: .signedDecimal)
+                            SliderRow(title: "Grain", systemImage: "circle.grid.cross", value: $editor.adjustments.grain, range: 0...2, format: .percent)
+                            SliderRow(title: "Bloom", systemImage: "sparkle.magnifyingglass", value: $editor.adjustments.bloom, range: 0...2, format: .percent)
+                            SliderRow(title: "Halation", systemImage: "sun.max", value: $editor.adjustments.halation, range: 0...2, format: .percent)
+                            SliderRow(title: "Vignette", systemImage: "circle.dashed", value: $editor.adjustments.vignette, range: 0...2, format: .percent)
+                            SliderRow(title: "Fade", systemImage: "shadow", value: $editor.adjustments.fade, range: 0...1, format: .percent)
+                            SliderRow(title: "Softness", systemImage: "camera.aperture", value: $editor.adjustments.softness, range: 0...2, format: .percent)
+                            SliderRow(title: "Dust", systemImage: "wand.and.stars", value: $editor.adjustments.dust, range: 0...2, format: .percent)
+
+                            Toggle(isOn: $editor.adjustments.borderEnabled) {
+                                Label("Border", systemImage: "rectangle.inset.filled")
+                            }
+                            .toggleStyle(.switch)
+                            .padding(12)
+                            .background(Color.white.opacity(0.045), in: RoundedRectangle(cornerRadius: 8))
+                        }
+                        .transition(.opacity.combined(with: .move(edge: .top)))
+                    }
                 }
                 .padding(.horizontal, 16)
                 .padding(.bottom, 18)
@@ -358,6 +389,92 @@ private struct FilmPicker: View {
         }
         .padding(12)
         .background(Color.white.opacity(0.045), in: RoundedRectangle(cornerRadius: 8))
+    }
+}
+
+private struct ModeSignatureCard: View {
+    let profile: FilmProfile
+
+    private var traits: [String] {
+        var values: [String] = []
+        let recipe = profile.recipe
+        switch recipe.output.aspect {
+        case .original: values.append("native frame")
+        case .threeByTwo: values.append("3:2 crop")
+        case .square: values.append("square")
+        case .halfFrame: values.append("half-frame")
+        case .instant: values.append("instant frame")
+        }
+        if recipe.output.palette != .natural {
+            values.append(recipe.output.palette.rawValue.replacingOccurrences(of: "([a-z])([A-Z])", with: "$1 $2", options: .regularExpression).lowercased())
+        }
+        if recipe.output.posterizeLevels > 1 {
+            values.append("\(Int(recipe.output.posterizeLevels)) tone")
+        }
+        if recipe.output.flashFalloff > 0.01 {
+            values.append("flash falloff")
+        }
+        if recipe.output.dateStamp {
+            values.append("date stamp")
+        }
+        if recipe.lens.fisheye > 0.01 {
+            values.append("fisheye")
+        }
+        if recipe.grain.amount > 0.55 {
+            values.append("heavy grain")
+        } else if recipe.grain.amount > 0.2 {
+            values.append("fine grain")
+        }
+        if recipe.vignette.amount > 0.65 {
+            values.append("dark corners")
+        }
+        if recipe.bloom.amount > 0.1 {
+            values.append("glow")
+        }
+        return Array(values.prefix(7))
+    }
+
+    var body: some View {
+        VStack(alignment: .leading, spacing: 10) {
+            HStack {
+                Label(profile.filmName, systemImage: "camera.filters")
+                    .font(.subheadline.weight(.semibold))
+                Spacer()
+                Text(profile.cameraName)
+                    .font(.caption)
+                    .foregroundStyle(.white.opacity(0.5))
+                    .lineLimit(1)
+            }
+
+            Text(profile.description)
+                .font(.caption)
+                .foregroundStyle(.white.opacity(0.58))
+                .lineLimit(4)
+
+            FlowTags(tags: traits)
+        }
+        .padding(12)
+        .background(Color.white.opacity(0.045), in: RoundedRectangle(cornerRadius: 8))
+    }
+}
+
+private struct FlowTags: View {
+    let tags: [String]
+
+    var body: some View {
+        LazyVGrid(columns: [GridItem(.adaptive(minimum: 86), spacing: 7)], alignment: .leading, spacing: 7) {
+            ForEach(tags, id: \.self) { tag in
+                Text(tag)
+                    .font(.caption2.weight(.semibold))
+                    .foregroundStyle(.white.opacity(0.68))
+                    .lineLimit(1)
+                    .minimumScaleFactor(0.78)
+                    .padding(.horizontal, 8)
+                    .padding(.vertical, 5)
+                    .frame(maxWidth: .infinity)
+                    .background(Color.white.opacity(0.06), in: RoundedRectangle(cornerRadius: 6))
+            }
+        }
     }
 }
 
