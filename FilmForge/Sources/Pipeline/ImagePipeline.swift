@@ -38,7 +38,10 @@ final class ImagePipeline {
         PreviewSizingStage(),
         AspectCropStage(),
         DownsampleStage(),
+        CaptureNormalizationStage(),
         ExposureTemperatureStage(),
+        ProfileTransformStage(),
+        ColorDensityStage(),
         LUTStage(),
         BaseColorStage(),
         SplitToneStage(),
@@ -63,6 +66,91 @@ final class ImagePipeline {
         try stages.reduce(source) { image, stage in
             try stage.render(image, context: context)
         }
+    }
+}
+
+struct CaptureNormalizationStage: PipelineStage {
+    func render(_ image: CIImage, context: RenderContext) throws -> CIImage {
+        let capture = context.profile.recipe.capture
+        guard capture.sourceMode != .neutral else { return image }
+        let intensity = context.adjustments.intensity
+        var output = image
+
+        if capture.phoneHDRSuppression > 0.001 || capture.dynamicRange != 1 {
+            let compression = capture.phoneHDRSuppression * intensity
+            let contrast = clamped(1 + (1 - capture.dynamicRange) * 0.38 + compression * 0.22, 0.72, 1.35)
+            output = output.applyingFilterIfAvailable("CIColorControls", parameters: [
+                kCIInputSaturationKey: 1,
+                kCIInputBrightnessKey: -0.015 * compression,
+                kCIInputContrastKey: contrast
+            ])
+        }
+
+        if capture.sensorClip > 0.001 {
+            let clipped = output.applyingFilterIfAvailable("CIHighlightShadowAdjust", parameters: [
+                "inputHighlightAmount": clamped(1 - capture.sensorClip * 0.55 * intensity, 0.25, 1),
+                "inputShadowAmount": clamped(0.08 + capture.noiseFloor * 0.15, 0, 0.45)
+            ])
+            output = mix(output, with: clipped, amount: min(0.8, capture.sensorClip * 0.65 * intensity))
+        }
+
+        if capture.inputSharpening > 0.001 {
+            output = output.applyingFilterIfAvailable("CISharpenLuminance", parameters: [
+                kCIInputSharpnessKey: capture.inputSharpening * intensity
+            ])
+        }
+
+        if capture.noiseFloor > 0.001 {
+            let lifted = output.applyingFilterIfAvailable("CIToneCurve", parameters: [
+                "inputPoint0": CIVector(x: 0, y: min(0.12, capture.noiseFloor * 0.08)),
+                "inputPoint1": CIVector(x: 0.25, y: 0.24 + capture.noiseFloor * 0.03),
+                "inputPoint2": CIVector(x: 0.5, y: 0.5),
+                "inputPoint3": CIVector(x: 0.75, y: 0.76),
+                "inputPoint4": CIVector(x: 1, y: 1)
+            ])
+            output = mix(output, with: lifted, amount: min(0.65, capture.noiseFloor * intensity))
+        }
+
+        return output.cropped(to: image.extent)
+    }
+}
+
+struct ProfileTransformStage: PipelineStage {
+    func render(_ image: CIImage, context: RenderContext) throws -> CIImage {
+        let recipe = context.profile.recipe
+        guard recipe.filmResponse.enabled || recipe.print.medium != .none || recipe.capture.sourceMode != .neutral else {
+            return image
+        }
+        let lut = GeneratedLookLUTFactory.make(profile: context.profile, dimension: 32)
+        let transformed = image.applyingFilterIfAvailable("CIColorCubeWithColorSpace", parameters: [
+            "inputCubeDimension": lut.dimension,
+            "inputCubeData": lut.data,
+            "inputColorSpace": context.workingColorSpace
+        ])
+        return mix(image, with: transformed, amount: min(1, 0.84 * context.adjustments.intensity))
+    }
+}
+
+struct ColorDensityStage: PipelineStage {
+    func render(_ image: CIImage, context: RenderContext) throws -> CIImage {
+        let response = context.profile.recipe.filmResponse
+        let print = context.profile.recipe.print
+        let amount = (response.densityStrength + max(0, print.saturation - 1) * 0.4) * context.adjustments.intensity
+        guard amount > 0.001 else { return image }
+
+        let saturated = image.applyingFilterIfAvailable("CIColorControls", parameters: [
+            kCIInputSaturationKey: 1 + amount * 0.42,
+            kCIInputBrightnessKey: -amount * 0.018,
+            kCIInputContrastKey: 1 + amount * 0.12
+        ])
+        let dense = saturated.applyingFilterIfAvailable("CIColorMatrix", parameters: [
+            "inputRVector": CIVector(x: 1 + amount * 0.05, y: 0, z: 0, w: 0),
+            "inputGVector": CIVector(x: 0, y: 1 + amount * 0.025, z: 0, w: 0),
+            "inputBVector": CIVector(x: 0, y: 0, z: 1 - amount * 0.025, w: 0),
+            "inputAVector": CIVector(x: 0, y: 0, z: 0, w: 1),
+            "inputBiasVector": CIVector(x: -amount * 0.012, y: -amount * 0.009, z: -amount * 0.006, w: 0)
+        ])
+        return mix(image, with: dense, amount: min(0.72, amount * 0.65))
     }
 }
 
@@ -142,11 +230,17 @@ struct ExposureTemperatureStage: PipelineStage {
 
 struct LUTStage: PipelineStage {
     func render(_ image: CIImage, context: RenderContext) throws -> CIImage {
+        let usesV2 = context.profile.recipe.filmResponse.enabled
+            || context.profile.recipe.print.medium != .none
+            || context.profile.recipe.capture.sourceMode != .neutral
         let recipes = context.profile.recipe.luts.isEmpty
             ? [LUTRecipe(id: "generated-profile", source: .generatedProfile, dimension: 16, strength: 0.52)]
             : context.profile.recipe.luts
 
         return try recipes.reduce(image) { current, recipe in
+            if usesV2, case .generatedProfile = recipe.source {
+                return current
+            }
             let lut: LUT3D
             switch recipe.source {
             case .generatedProfile:

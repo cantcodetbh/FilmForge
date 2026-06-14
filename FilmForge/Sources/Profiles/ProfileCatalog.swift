@@ -118,6 +118,9 @@ enum ProfileCatalog {
                     $0.lens.sharpen += 0.08
                     $0.color.saturation *= 0.96
                     $0.tone.p4.y = 0.92
+                    $0.print = print(.minilab, contrast: 1.02, saturation: 1.0, black: 0.025, white: 0.93, yellow: 0.08, warmth: 0.08, tint: 0.04)
+                    $0.filmResponse.over.highlightCompression = 0.78
+                    $0.filmResponse.normal.density = 0.28
                 },
                 authoredFilm(camera: camera, stock: ultramax400, suffix: "gold-party", name: "Gold Party 400", tagline: "Consumer flash warmth") {
                     $0.color.temperature += 0.18
@@ -138,6 +141,10 @@ enum ProfileCatalog {
                     $0.color.temperature -= 0.08
                     $0.tone.p4.y = 1
                     $0.tone.p0.y = 0
+                    $0.print = print(.slideProjection, contrast: 1.2, saturation: 1.18, black: 0.005, white: 0.99, cyan: -0.03, yellow: -0.02)
+                    $0.filmResponse.under.contrast = 1.28
+                    $0.filmResponse.over.highlightCompression = 0.32
+                    $0.filmResponse.densityStrength = 0.78
                 }
             ]
         case contaxT2.id:
@@ -276,6 +283,10 @@ enum ProfileCatalog {
                     $0.color.saturation *= 1.24
                     $0.tone.p0.y += 0.07
                     $0.tone.p4.y = 0.91
+                    $0.print = print(.slideProjection, contrast: 1.28, saturation: 1.26, black: 0.025, white: 0.9, cyan: -0.18, magenta: 0.1, yellow: 0.16, warmth: 0.16)
+                    $0.filmResponse.under.blue *= 1.12
+                    $0.filmResponse.normal.red *= 1.12
+                    $0.filmResponse.over.highlightCompression = 0.72
                 },
                 authoredFilm(camera: camera, stock: ultramax400, suffix: "redscale", name: "Redscale", tagline: "Burnt orange experiment") {
                     $0.color.temperature += 0.64
@@ -314,6 +325,9 @@ enum ProfileCatalog {
                     $0.color.temperature += 0.28
                     $0.color.redBias *= 1.12
                     $0.output.lightLeak = 0.75
+                    $0.print = print(.cheapScan, contrast: 0.96, saturation: 0.96, black: 0.07, white: 0.86, yellow: 0.22, warmth: 0.34, tint: 0.18)
+                    $0.filmResponse.under.shadowLift = 0.11
+                    $0.filmResponse.over.highlightCompression = 0.86
                 },
                 authoredFilm(camera: camera, stock: ultramax400, suffix: "holga-fisheye", name: "Fisheye Toy", tagline: "Rounded plastic bend") {
                     $0.lens.fisheye = .circular(cropped: true, strength: 0.95, fieldOfView: 170, imageCircle: 1.02, edgeDarkness: 0.95, edgeBlur: 0.48, chromaticEdge: 0.7)
@@ -336,6 +350,9 @@ enum ProfileCatalog {
                     $0.color.saturation *= 1.18
                     $0.vignette.amount += 0.42
                     $0.output.lightLeak = 0.22
+                    $0.print = print(.slideProjection, contrast: 1.04, saturation: 1.18, black: 0.05, white: 0.88, cyan: -0.06, magenta: 0.22, yellow: -0.08)
+                    $0.filmResponse.normal.blue *= 1.18
+                    $0.filmResponse.over.red *= 1.08
                 },
                 authoredFilm(camera: camera, stock: ultramax400, suffix: "diana-fisheye", name: "Fisheye Dream", tagline: "Soft bent edges") {
                     $0.lens.fisheye = .circular(cropped: false, strength: 0.9, fieldOfView: 170, imageCircle: 0.92, edgeDarkness: 1.05, edgeBlur: 0.55, chromaticEdge: 0.78)
@@ -390,6 +407,9 @@ enum ProfileCatalog {
                     $0.output.flashFalloff = 0.95
                     $0.output.lightLeak = 0.16
                     $0.output.dateStamp = true
+                    $0.print = print(.cheapScan, contrast: 1.22, saturation: 1.18, black: 0.015, white: 0.86, yellow: 0.16, warmth: 0.28)
+                    $0.filmResponse.over.highlightCompression = 0.9
+                    $0.filmResponse.under.contrast = 1.24
                 },
                 authoredFilm(camera: camera, stock: ultramax400, suffix: "beach-day", name: "Beach Day", tagline: "Cheap sun colour") {
                     $0.color.saturation *= 1.28
@@ -436,6 +456,8 @@ enum ProfileCatalog {
                     $0.color.saturation *= 0.86
                     $0.output.jpegCrunch = 0.82
                     $0.output.chromaBleed = 0.34
+                    $0.print = print(.ccdProcessor, contrast: 1.16, saturation: 0.86, black: 0.025, white: 0.82, cyan: 0.08)
+                    $0.filmResponse.enabled = false
                 }
             ]
         case sonyF707.id:
@@ -454,6 +476,8 @@ enum ProfileCatalog {
                     $0.aberration.amount += 1.05
                     $0.output.jpegCrunch = 0.32
                     $0.output.chromaBleed = 0.48
+                    $0.print = print(.ccdProcessor, contrast: 1.32, saturation: 1.24, black: 0.01, white: 0.84, cyan: -0.08, magenta: 0.14)
+                    $0.filmResponse.enabled = false
                 }
             ]
         case miniDVGrab.id:
@@ -465,6 +489,8 @@ enum ProfileCatalog {
                     $0.output.jpegCrunch = 0.7
                     $0.output.chromaBleed = 0.64
                     $0.output.scanlines = 0.58
+                    $0.print = print(.ccdProcessor, contrast: 1.36, saturation: 1.28, black: 0.03, white: 0.8, cyan: 0.08, magenta: -0.08)
+                    $0.filmResponse.enabled = false
                 },
                 authoredFilm(camera: camera, stock: digitalCCD, suffix: "night-tape", name: "Night Tape", tagline: "Blue noisy camcorder") {
                     $0.color.temperature -= 0.38
@@ -535,6 +561,10 @@ enum ProfileCatalog {
                     $0.output.jpegCrunch = 0.32
                     $0.output.chromaBleed = 0.24
                     $0.output.labControlsEnabled = false
+                    $0.print = print(.minilab, contrast: 1.08, saturation: 1.12, black: 0.07, white: 0.86, yellow: 0.34, warmth: 0.44, tint: 0.22)
+                    $0.filmResponse.normal.red *= 1.12
+                    $0.filmResponse.over.highlightCompression = 0.84
+                    $0.filmResponse.under.shadowLift = 0.1
                 },
                 authoredFilm(camera: camera, stock: digitalCCD, suffix: "flash-wood", name: "Flash Wood", tagline: "Bright warm flash") {
                     $0.color.exposure += 0.28
@@ -573,6 +603,7 @@ enum ProfileCatalog {
         description: "A controlled 35mm SLR body with moderate optical contrast, natural sharpness, and restrained falloff.",
         accent: ProfileAccent(red: 0.78, green: 0.72, blue: 0.64),
         recipe: cameraRecipe(
+            capture: capture(.rawNatural, dynamicRange: 0.94, sensorClip: 0.12, hdr: 0.2, sharpening: 0.06, noise: 0.08),
             color: color(exposure: 0, contrast: 1.03, saturation: 1, temperature: 0.02, red: 1, green: 1, blue: 1),
             tone: curve(0.01, 0.23, 0.5, 0.78, 0.98),
             bloom: 0.02,
@@ -593,6 +624,7 @@ enum ProfileCatalog {
         description: "Compact 35mm rendering with crisp central detail, punchy microcontrast, and mild flash-era edge falloff.",
         accent: ProfileAccent(red: 0.68, green: 0.72, blue: 0.78),
         recipe: cameraRecipe(
+            capture: capture(.heifProcessed, dynamicRange: 1.04, sensorClip: 0.08, hdr: 0.28, sharpening: 0.18, noise: 0.03),
             color: color(exposure: 0.02, contrast: 1.08, saturation: 1.02, temperature: 0.03, red: 1.01, green: 1, blue: 0.99),
             tone: curve(0.0, 0.2, 0.51, 0.82, 0.99),
             bloom: 0.04,
@@ -613,6 +645,7 @@ enum ProfileCatalog {
         description: "A sharp 35mm compact look with hard microcontrast, clean center detail, and glossy point-and-shoot colour.",
         accent: ProfileAccent(red: 0.62, green: 0.72, blue: 0.84),
         recipe: cameraRecipe(
+            capture: capture(.heifProcessed, dynamicRange: 1.02, sensorClip: 0.1, hdr: 0.3, sharpening: 0.24, noise: 0.04),
             color: color(exposure: 0.01, contrast: 1.12, saturation: 1.04, temperature: 0, tint: 0.01, red: 1.01, green: 1.01, blue: 1),
             tone: curve(0, 0.18, 0.5, 0.84, 0.99),
             bloom: 0.03,
@@ -633,6 +666,7 @@ enum ProfileCatalog {
         description: "Tiny 35mm rangefinder behavior with intimate contrast, visible corner falloff, and soft pocket-camera edges.",
         accent: ProfileAccent(red: 0.72, green: 0.62, blue: 0.52),
         recipe: cameraRecipe(
+            capture: capture(.rawNatural, dynamicRange: 0.9, sensorClip: 0.16, hdr: 0.14, sharpening: 0.04, noise: 0.12),
             color: color(exposure: -0.01, contrast: 1.02, saturation: 0.98, temperature: 0.03, tint: -0.01, red: 1.01, green: 1, blue: 0.98),
             tone: curve(0.03, 0.23, 0.5, 0.78, 0.96),
             bloom: 0.02,
@@ -737,6 +771,7 @@ enum ProfileCatalog {
         description: "Compact Lomographic style with heavy corner density, punchy colour, imperfect exposure, and high-energy contrast.",
         accent: ProfileAccent(red: 0.95, green: 0.35, blue: 0.28),
         recipe: cameraRecipe(
+            capture: capture(.rawNatural, dynamicRange: 0.84, sensorClip: 0.24, hdr: 0.08, sharpening: 0.02, noise: 0.16),
             color: color(exposure: -0.04, brightness: 0.01, contrast: 1.16, saturation: 1.18, temperature: 0.08, tint: 0.03, red: 1.05, green: 0.98, blue: 0.98),
             tone: curve(0.02, 0.16, 0.5, 0.84, 0.96),
             bloom: 0.06,
@@ -758,6 +793,7 @@ enum ProfileCatalog {
         description: "Soft plastic lens, strong corner darkening, uneven contrast, possible light-leak energy, and medium-format roughness.",
         accent: ProfileAccent(red: 0.92, green: 0.42, blue: 0.34),
         recipe: cameraRecipe(
+            capture: capture(.toy, dynamicRange: 0.78, sensorClip: 0.22, hdr: 0, sharpening: 0, noise: 0.22),
             color: color(exposure: 0.04, brightness: 0.01, contrast: 1.1, saturation: 1.06, temperature: 0.1, tint: 0.04, red: 1.04, green: 0.98, blue: 0.94),
             tone: curve(0.02, 0.18, 0.52, 0.78, 0.94),
             bloom: 0.07,
@@ -779,6 +815,7 @@ enum ProfileCatalog {
         description: "Lower saturation, soft surreal blur, heavy vignette, and unpredictable plastic-lens color.",
         accent: ProfileAccent(red: 0.58, green: 0.48, blue: 0.92),
         recipe: cameraRecipe(
+            capture: capture(.toy, dynamicRange: 0.74, sensorClip: 0.18, hdr: 0, sharpening: 0, noise: 0.24),
             color: color(exposure: 0.05, brightness: 0.02, contrast: 0.94, saturation: 0.86, temperature: 0.05, tint: 0.12, red: 1.02, green: 0.96, blue: 1.08),
             tone: curve(0.06, 0.26, 0.51, 0.73, 0.91),
             bloom: 0.1,
@@ -800,6 +837,8 @@ enum ProfileCatalog {
         description: "Low-speed instant-camera behavior with warm chemistry, bright natural-light bias, creamy highlights, and white-frame presentation.",
         accent: ProfileAccent(red: 0.95, green: 0.82, blue: 0.58),
         recipe: cameraRecipe(
+            capture: capture(.instant, dynamicRange: 0.72, sensorClip: 0.12, hdr: 0, sharpening: 0, noise: 0.2),
+            print: print(.instantChemistry, contrast: 0.82, saturation: 0.86, black: 0.08, white: 0.88, yellow: 0.22, warmth: 0.28, tint: 0.22),
             color: color(exposure: 0.08, brightness: 0.03, contrast: 0.9, saturation: 0.92, temperature: 0.22, tint: 0.04, red: 1.05, green: 1.01, blue: 0.94),
             tone: curve(0.1, 0.3, 0.54, 0.78, 0.93),
             bloom: 0.16,
@@ -842,6 +881,8 @@ enum ProfileCatalog {
         description: "Fixed-focus plastic optics, flash-forward contrast, rough corners, coarse grain emphasis, and imperfect color.",
         accent: ProfileAccent(red: 0.98, green: 0.76, blue: 0.22),
         recipe: cameraRecipe(
+            capture: capture(.toy, dynamicRange: 0.8, sensorClip: 0.3, hdr: 0, sharpening: 0.02, noise: 0.22),
+            print: print(.cheapScan, contrast: 1.14, saturation: 1.12, black: 0.03, white: 0.9, yellow: 0.1, warmth: 0.18, tint: 0.08),
             color: color(exposure: 0.18, brightness: 0.02, contrast: 1.18, saturation: 1.12, temperature: 0.18, tint: -0.02, red: 1.05, green: 1, blue: 0.92),
             tone: curve(0.0, 0.17, 0.5, 0.86, 1),
             grain: GrainRecipe(amount: 0.12, scale: 0.25, monochrome: false, shadows: 0.12, highlights: 0.05),
@@ -864,6 +905,8 @@ enum ProfileCatalog {
         description: "Early CCD compact color with good balance, brittle highlights, JPEG-era sharpness, and low-resolution texture.",
         accent: ProfileAccent(red: 0.56, green: 0.68, blue: 0.92),
         recipe: cameraRecipe(
+            capture: capture(.ccdJpeg, dynamicRange: 0.76, sensorClip: 0.46, hdr: 0, sharpening: 0.42, noise: 0.26),
+            print: print(.ccdProcessor, contrast: 1.18, saturation: 1.06, black: 0.015, white: 0.9, cyan: 0.04, magenta: -0.03),
             color: color(exposure: 0.02, contrast: 1.2, saturation: 1.05, temperature: 0.04, tint: -0.04, red: 1.02, green: 1.02, blue: 0.98),
             tone: curve(0, 0.16, 0.5, 0.88, 0.97),
             grain: GrainRecipe(amount: 0.36, scale: 0.95, monochrome: false, shadows: 0.9, highlights: 0.8),
@@ -885,6 +928,8 @@ enum ProfileCatalog {
         description: "Vivid early-2000s CCD output with crisp detail, purple/cyan fringing, limited dynamic range, and saturated reds.",
         accent: ProfileAccent(red: 0.42, green: 0.56, blue: 1),
         recipe: cameraRecipe(
+            capture: capture(.ccdJpeg, dynamicRange: 0.72, sensorClip: 0.5, hdr: 0, sharpening: 0.5, noise: 0.28),
+            print: print(.ccdProcessor, contrast: 1.24, saturation: 1.16, black: 0.01, white: 0.88, cyan: -0.03, magenta: 0.06),
             color: color(exposure: 0.03, contrast: 1.24, saturation: 1.16, temperature: -0.05, tint: 0.05, red: 1.05, green: 1, blue: 1.08),
             tone: curve(0, 0.14, 0.51, 0.9, 0.98),
             grain: GrainRecipe(amount: 0.42, scale: 1.05, monochrome: false, shadows: 0.9, highlights: 0.85),
@@ -906,6 +951,8 @@ enum ProfileCatalog {
         description: "Low-resolution video-still character with clipped colors, digital sharpness, chroma noise, and compact dynamic range.",
         accent: ProfileAccent(red: 0.66, green: 0.7, blue: 1),
         recipe: cameraRecipe(
+            capture: capture(.ccdJpeg, dynamicRange: 0.68, sensorClip: 0.52, hdr: 0, sharpening: 0.55, noise: 0.32),
+            print: print(.ccdProcessor, contrast: 1.28, saturation: 1.2, black: 0.02, white: 0.86, cyan: 0.04, magenta: -0.04),
             color: color(exposure: 0.02, contrast: 1.28, saturation: 1.18, temperature: -0.12, tint: -0.04, red: 0.98, green: 1.02, blue: 1.08),
             tone: curve(0, 0.13, 0.52, 0.91, 1),
             grain: GrainRecipe(amount: 0.5, scale: 0.9, monochrome: false, shadows: 0.9, highlights: 0.85),
@@ -927,6 +974,8 @@ enum ProfileCatalog {
         description: "Low-resolution floppy-camera output with visible JPEG-era crunch, clipped highlights, and smeared early digital colour.",
         accent: ProfileAccent(red: 0.38, green: 0.52, blue: 0.82),
         recipe: cameraRecipe(
+            capture: capture(.ccdJpeg, dynamicRange: 0.66, sensorClip: 0.55, hdr: 0, sharpening: 0.6, noise: 0.34),
+            print: print(.ccdProcessor, contrast: 1.18, saturation: 0.9, black: 0.025, white: 0.86, cyan: 0.05),
             color: color(exposure: 0.01, contrast: 1.18, saturation: 0.92, temperature: -0.04, tint: -0.02, red: 0.98, green: 1.02, blue: 1.04),
             tone: curve(0, 0.15, 0.5, 0.88, 0.96),
             grain: GrainRecipe(amount: 0.55, scale: 0.8, monochrome: false, shadows: 0.9, highlights: 0.8),
@@ -969,6 +1018,8 @@ enum ProfileCatalog {
         description: "A warm R-series app-camera style with amber interiors, soft flash, lifted blacks, and glossy urban-night colour.",
         accent: ProfileAccent(red: 0.98, green: 0.62, blue: 0.28),
         recipe: cameraRecipe(
+            capture: capture(.rawNatural, dynamicRange: 0.82, sensorClip: 0.32, hdr: 0.05, sharpening: 0.18, noise: 0.24, wb: 0.22),
+            print: print(.minilab, contrast: 1.1, saturation: 1.12, black: 0.045, white: 0.9, yellow: 0.18, warmth: 0.28, tint: 0.14),
             color: color(exposure: 0.06, brightness: 0.02, contrast: 1.08, saturation: 1.08, temperature: 0.28, tint: 0.04, red: 1.08, green: 0.99, blue: 0.88),
             tone: curve(0.06, 0.25, 0.52, 0.82, 0.96),
             grain: GrainRecipe(amount: 0.32, scale: 0.95, monochrome: false, shadows: 0.75, highlights: 0.5),
@@ -1230,6 +1281,8 @@ enum ProfileCatalog {
     }
 
     private static func cameraRecipe(
+        capture: CaptureRecipe = .neutral,
+        print: PrintRecipe = .neutral,
         color: ColorRecipe,
         tone: ToneCurveRecipe,
         grain: GrainRecipe = GrainRecipe(amount: 0, scale: 0, monochrome: true, shadows: 0, highlights: 0),
@@ -1242,6 +1295,8 @@ enum ProfileCatalog {
         border: BorderRecipe.Style
     ) -> FilmRecipe {
         FilmRecipe(
+            capture: capture,
+            print: print,
             color: color,
             luts: [LUTRecipe(id: "camera-\(border.rawValue)", source: .generatedProfile, dimension: 16, strength: 0.24)],
             tone: tone,
@@ -1269,6 +1324,8 @@ enum ProfileCatalog {
         var color = color
         color.monochrome = monochrome
         return FilmRecipe(
+            filmResponse: sampledFilmResponse(color: color, monochrome: monochrome),
+            print: defaultPrint(for: color, monochrome: monochrome, border: border),
             color: color,
             luts: [LUTRecipe(id: "film-\(border.rawValue)-\(monochrome ? "mono" : "color")", source: .generatedProfile, dimension: 16, strength: monochrome ? 0.48 : 0.62)],
             tone: tone,
@@ -1328,11 +1385,129 @@ enum ProfileCatalog {
             p4: CGPoint(x: 1, y: y4)
         )
     }
+
+    private static func capture(
+        _ sourceMode: CaptureRecipe.SourceMode,
+        dynamicRange: Double,
+        sensorClip: Double,
+        hdr: Double,
+        sharpening: Double,
+        noise: Double,
+        wb: Double = 0
+    ) -> CaptureRecipe {
+        CaptureRecipe(
+            sourceMode: sourceMode,
+            dynamicRange: dynamicRange,
+            sensorClip: sensorClip,
+            phoneHDRSuppression: hdr,
+            inputSharpening: sharpening,
+            noiseFloor: noise,
+            whiteBalanceBias: wb
+        )
+    }
+
+    private static func sampledFilmResponse(color: ColorRecipe, monochrome: Bool) -> FilmResponseRecipe {
+        let saturation = monochrome ? 0.0 : color.saturation
+        let density = monochrome ? 0.18 : clamped((saturation - 0.85) * 0.55 + abs(color.temperature) * 0.18, 0.08, 0.62)
+        return FilmResponseRecipe(
+            enabled: true,
+            under: FilmResponseRecipe.ExposureState(
+                contrast: clamped(color.contrast * 1.08, 0.78, 1.55),
+                saturation: clamped(saturation * 0.86, 0, 1.6),
+                red: color.redBias * (1 + color.shadowRed * 0.08),
+                green: color.greenBias * (1 + color.shadowGreen * 0.08),
+                blue: color.blueBias * (1 + color.shadowBlue * 0.08),
+                shadowLift: clamped(color.toneShadowLift, 0, 0.14),
+                highlightCompression: 0.2,
+                density: density * 0.8
+            ),
+            normal: FilmResponseRecipe.ExposureState(
+                contrast: clamped(color.contrast, 0.75, 1.5),
+                saturation: clamped(saturation, 0, 1.7),
+                red: color.redBias,
+                green: color.greenBias,
+                blue: color.blueBias,
+                shadowLift: clamped(color.toneShadowLift * 0.6, 0, 0.1),
+                highlightCompression: 0.32,
+                density: density
+            ),
+            over: FilmResponseRecipe.ExposureState(
+                contrast: clamped(color.contrast * 0.92, 0.7, 1.35),
+                saturation: clamped(saturation * (monochrome ? 1 : 1.08), 0, 1.8),
+                red: color.redBias * (1 + color.highlightRed * 0.08),
+                green: color.greenBias * (1 + color.highlightGreen * 0.08),
+                blue: color.blueBias * (1 + color.highlightBlue * 0.08),
+                shadowLift: 0.02,
+                highlightCompression: 0.62,
+                density: density * 1.15
+            ),
+            lumaStrength: monochrome ? 0.82 : 0.68,
+            chromaStrength: monochrome ? 0 : 0.76,
+            densityStrength: monochrome ? 0.35 : 0.62
+        )
+    }
+
+    private static func defaultPrint(for color: ColorRecipe, monochrome: Bool, border: BorderRecipe.Style) -> PrintRecipe {
+        if border == .instant {
+            return print(.instantChemistry, contrast: 0.88, saturation: 0.9, black: 0.06, white: 0.92, yellow: 0.16, warmth: 0.22, tint: 0.18)
+        }
+        if monochrome {
+            return print(.opticalPrint, contrast: 1.12, saturation: 0, black: 0.02, white: 0.96, warmth: 0.04, tint: 0.04)
+        }
+        let medium: PrintRecipe.Medium = color.contrast > 1.14 || color.saturation > 1.2 ? .slideProjection : .minilab
+        return print(
+            medium,
+            contrast: medium == .slideProjection ? 1.14 : 1.04,
+            saturation: medium == .slideProjection ? 1.12 : 1.03,
+            black: medium == .slideProjection ? 0.01 : 0.025,
+            white: medium == .slideProjection ? 0.98 : 0.94,
+            cyan: -color.cyanShift * 0.4,
+            magenta: -color.magentaShift * 0.4,
+            yellow: color.yellowShift * 0.35,
+            warmth: max(0, color.temperature) * 0.18,
+            tint: max(0, color.temperature) * 0.08
+        )
+    }
+
+    private static func print(
+        _ medium: PrintRecipe.Medium,
+        contrast: Double,
+        saturation: Double,
+        black: Double,
+        white: Double,
+        cyan: Double = 0,
+        magenta: Double = 0,
+        yellow: Double = 0,
+        warmth: Double = 0,
+        tint: Double = 0
+    ) -> PrintRecipe {
+        PrintRecipe(
+            medium: medium,
+            contrast: contrast,
+            saturation: saturation,
+            blackPoint: black,
+            whitePoint: white,
+            cyan: cyan,
+            magenta: magenta,
+            yellow: yellow,
+            highlightWarmth: warmth,
+            paperTint: tint
+        )
+    }
+}
+
+private extension ColorRecipe {
+    var toneShadowLift: Double {
+        max(0, shadowRed + shadowGreen + shadowBlue) / 3
+    }
 }
 
 enum RecipeComposer {
     static func combine(_ camera: FilmRecipe, _ film: FilmRecipe) -> FilmRecipe {
         FilmRecipe(
+            capture: combineCapture(camera.capture, film.capture),
+            filmResponse: film.filmResponse.enabled ? film.filmResponse : camera.filmResponse,
+            print: combinePrint(camera.print, film.print),
             color: ColorRecipe(
                 exposure: camera.color.exposure + film.color.exposure,
                 brightness: camera.color.brightness + film.color.brightness,
@@ -1411,4 +1586,36 @@ enum RecipeComposer {
             border: camera.border.style == .none ? film.border : camera.border
         )
     }
+
+    private static func combineCapture(_ camera: CaptureRecipe, _ film: CaptureRecipe) -> CaptureRecipe {
+        CaptureRecipe(
+            sourceMode: camera.sourceMode == .neutral ? film.sourceMode : camera.sourceMode,
+            dynamicRange: camera.dynamicRange * film.dynamicRange,
+            sensorClip: max(camera.sensorClip, film.sensorClip),
+            phoneHDRSuppression: max(camera.phoneHDRSuppression, film.phoneHDRSuppression),
+            inputSharpening: camera.inputSharpening + film.inputSharpening,
+            noiseFloor: camera.noiseFloor + film.noiseFloor,
+            whiteBalanceBias: camera.whiteBalanceBias + film.whiteBalanceBias
+        )
+    }
+
+    private static func combinePrint(_ camera: PrintRecipe, _ film: PrintRecipe) -> PrintRecipe {
+        PrintRecipe(
+            medium: film.medium == .none ? camera.medium : film.medium,
+            contrast: camera.printFactor * film.contrast,
+            saturation: camera.printSaturation * film.saturation,
+            blackPoint: camera.blackPoint + film.blackPoint,
+            whitePoint: min(camera.whitePoint, film.whitePoint),
+            cyan: camera.cyan + film.cyan,
+            magenta: camera.magenta + film.magenta,
+            yellow: camera.yellow + film.yellow,
+            highlightWarmth: camera.highlightWarmth + film.highlightWarmth,
+            paperTint: camera.paperTint + film.paperTint
+        )
+    }
+}
+
+private extension PrintRecipe {
+    var printFactor: Double { contrast == 0 ? 1 : contrast }
+    var printSaturation: Double { saturation == 0 ? 1 : saturation }
 }

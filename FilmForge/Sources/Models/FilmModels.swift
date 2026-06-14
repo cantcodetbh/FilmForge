@@ -67,6 +67,9 @@ struct ProfileAccent: Hashable, Sendable {
 }
 
 struct FilmRecipe: Hashable, Sendable {
+    var capture: CaptureRecipe = .neutral
+    var filmResponse: FilmResponseRecipe = .neutral
+    var print: PrintRecipe = .neutral
     var color: ColorRecipe
     var luts: [LUTRecipe] = []
     var tone: ToneCurveRecipe
@@ -91,6 +94,113 @@ struct LUTRecipe: Hashable, Sendable {
     var source: Source
     var dimension: Int
     var strength: Double
+}
+
+struct CaptureRecipe: Hashable, Sendable {
+    enum SourceMode: String, Hashable, Sendable {
+        case neutral
+        case heifProcessed
+        case rawNatural
+        case ccdJpeg
+        case instant
+        case toy
+    }
+
+    var sourceMode: SourceMode
+    var dynamicRange: Double
+    var sensorClip: Double
+    var phoneHDRSuppression: Double
+    var inputSharpening: Double
+    var noiseFloor: Double
+    var whiteBalanceBias: Double
+
+    static let neutral = CaptureRecipe(
+        sourceMode: .neutral,
+        dynamicRange: 1,
+        sensorClip: 0,
+        phoneHDRSuppression: 0,
+        inputSharpening: 0,
+        noiseFloor: 0,
+        whiteBalanceBias: 0
+    )
+}
+
+struct FilmResponseRecipe: Hashable, Sendable {
+    struct ExposureState: Hashable, Sendable {
+        var contrast: Double
+        var saturation: Double
+        var red: Double
+        var green: Double
+        var blue: Double
+        var shadowLift: Double
+        var highlightCompression: Double
+        var density: Double
+    }
+
+    var enabled: Bool
+    var under: ExposureState
+    var normal: ExposureState
+    var over: ExposureState
+    var lumaStrength: Double
+    var chromaStrength: Double
+    var densityStrength: Double
+
+    static let neutralState = ExposureState(
+        contrast: 1,
+        saturation: 1,
+        red: 1,
+        green: 1,
+        blue: 1,
+        shadowLift: 0,
+        highlightCompression: 0,
+        density: 0
+    )
+
+    static let neutral = FilmResponseRecipe(
+        enabled: false,
+        under: neutralState,
+        normal: neutralState,
+        over: neutralState,
+        lumaStrength: 0,
+        chromaStrength: 0,
+        densityStrength: 0
+    )
+}
+
+struct PrintRecipe: Hashable, Sendable {
+    enum Medium: String, Hashable, Sendable {
+        case none
+        case minilab
+        case opticalPrint
+        case slideProjection
+        case instantChemistry
+        case ccdProcessor
+        case cheapScan
+    }
+
+    var medium: Medium
+    var contrast: Double
+    var saturation: Double
+    var blackPoint: Double
+    var whitePoint: Double
+    var cyan: Double
+    var magenta: Double
+    var yellow: Double
+    var highlightWarmth: Double
+    var paperTint: Double
+
+    static let neutral = PrintRecipe(
+        medium: .none,
+        contrast: 1,
+        saturation: 1,
+        blackPoint: 0,
+        whitePoint: 1,
+        cyan: 0,
+        magenta: 0,
+        yellow: 0,
+        highlightWarmth: 0,
+        paperTint: 0
+    )
 }
 
 struct ColourManagedImage: @unchecked Sendable {
@@ -314,6 +424,9 @@ struct BorderRecipe: Hashable, Sendable {
 
 extension FilmRecipe {
     static let neutral = FilmRecipe(
+        capture: .neutral,
+        filmResponse: .neutral,
+        print: .neutral,
         color: ColorRecipe(
             exposure: 0,
             brightness: 0,
