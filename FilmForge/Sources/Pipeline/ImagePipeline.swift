@@ -519,6 +519,7 @@ struct FisheyeStage: PipelineStage {
             warped = kernel.apply(
                 extent: extent,
                 roiCallback: { _, rect in rect.insetBy(dx: -base * 0.16, dy: -base * 0.16) },
+                image: image,
                 arguments: [extent.minX, extent.minY, extent.width, extent.height, min(amount, 1.2), circle, cropMode]
             )?.cropped(to: extent) ?? fallbackFisheye(image, amount: amount)
         } else {

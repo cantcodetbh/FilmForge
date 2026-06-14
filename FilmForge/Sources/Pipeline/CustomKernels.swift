@@ -15,14 +15,18 @@ enum FilmKernelLibrary {
                 return coord;
             }
 
-            float circle = max(imageCircle, 0.25);
-            float normalizedRadius = radius / circle;
-            float bounded = clamp(normalizedRadius, 0.0, 1.65);
-            float sourceRadius = tan(bounded * 0.98) / tan(0.98);
-            sourceRadius = mix(normalizedRadius, sourceRadius, clamp(strength, 0.0, 1.2));
+            float halfWidth = size.x / base;
+            float halfHeight = size.y / base;
+            float maxRadius = length(float2(halfWidth, halfHeight));
+            float circle = cropMode > 0.5 ? max(imageCircle, 0.72) : maxRadius;
+            float normalizedRadius = clamp(radius / circle, 0.0, 1.0);
+            float bend = clamp(strength, 0.0, 1.2);
+            float falloff = pow(max(0.0, 1.0 - normalizedRadius), 0.72);
+            float barrelRadius = normalizedRadius + bend * 0.48 * normalizedRadius * falloff;
+            float sourceRadius = mix(normalizedRadius, min(barrelRadius, 1.0), clamp(strength, 0.0, 1.0));
 
-            if (cropMode > 0.5) {
-                sourceRadius *= 0.84;
+            if (radius > circle && cropMode > 0.5) {
+                return center + normalize(p) * circle * base * 0.5;
             }
 
             vec2 source = center + normalize(p) * sourceRadius * circle * base * 0.5;
