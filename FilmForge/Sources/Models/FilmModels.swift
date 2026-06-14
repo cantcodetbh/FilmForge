@@ -43,6 +43,7 @@ struct FilmStock: Identifiable, Hashable, Sendable {
 }
 
 enum CaptureFormat: String, CaseIterable, Hashable, Sendable {
+    case referenceLook = "Looks"
     case thirtyFive = "135"
     case medium120 = "120"
     case halfFrame = "Half-frame"
@@ -386,10 +387,17 @@ struct OutputRecipe: Hashable, Sendable {
         case thermal
     }
 
+    enum DateStampStyle: String, Hashable, Sendable {
+        case classic
+        case verticalRed
+        case yellowDigital
+    }
+
     var aspect: Aspect = .original
     var palette: Palette = .natural
     var posterizeLevels: Double = 0
     var dateStamp: Bool = false
+    var dateStampStyle: DateStampStyle = .classic
     var flashFalloff: Double = 0
     var labControlsEnabled: Bool = false
     var jpegCrunch: Double = 0
@@ -414,8 +422,11 @@ struct BorderRecipe: Hashable, Sendable {
         case none
         case thin
         case instant
+        case roundedInstant
         case print
         case halfFrame
+        case sprocket35
+        case circleFisheye
     }
 
     var style: Style

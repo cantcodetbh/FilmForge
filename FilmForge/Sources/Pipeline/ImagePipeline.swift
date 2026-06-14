@@ -564,6 +564,17 @@ struct FisheyeStage: PipelineStage {
                 "inputBackgroundImage": outside,
                 "inputMaskImage": circleMask
             ]).cropped(to: extent)
+
+            let rimOuter = radialEdgeMask(extent: extent, inner: max(1, radius - feather * 1.8), outer: radius + feather * 1.4)
+            let rimInner = radialEdgeMask(extent: extent, inner: max(1, radius - feather * 3.6), outer: max(2, radius - feather * 1.6))
+            let blueRim = constantColorImage(red: 0.08, green: 0.42, blue: 1, alpha: min(0.34, 0.18 + fisheye.chromaticEdge * 0.16), extent: extent)
+                .applyingFilterIfAvailable("CISourceInCompositing", parameters: ["inputBackgroundImage": rimOuter])
+            let warmRim = constantColorImage(red: 1, green: 0.76, blue: 0.26, alpha: min(0.22, 0.08 + fisheye.chromaticEdge * 0.12), extent: extent)
+                .applyingFilterIfAvailable("CISourceInCompositing", parameters: ["inputBackgroundImage": rimInner])
+            output = blueRim
+                .applyingFilterIfAvailable("CIScreenBlendMode", parameters: ["inputBackgroundImage": output])
+                .applyingFilterIfAvailable("CIScreenBlendMode", parameters: ["inputBackgroundImage": warmRim])
+                .cropped(to: extent)
         }
 
         return output.cropped(to: extent)
@@ -743,9 +754,41 @@ struct DustStage: PipelineStage {
                 "inputBiasVector": CIVector(x: 0, y: 0, z: 0, w: 0)
             ])
 
-        return dust.applyingFilterIfAvailable("CIScreenBlendMode", parameters: [
+        var output = dust.applyingFilterIfAvailable("CIScreenBlendMode", parameters: [
             "inputBackgroundImage": image
         ]).cropped(to: extent)
+
+        let scratches = recipe.scratches * context.adjustments.dust * context.adjustments.intensity
+        if scratches > 0.001, let scratchOverlay = makeScratchOverlay(extent: extent, amount: scratches, seed: UInt64(context.renderSeed)) {
+            output = scratchOverlay.applyingFilterIfAvailable("CIScreenBlendMode", parameters: [
+                "inputBackgroundImage": output
+            ]).cropped(to: extent)
+        }
+
+        return output
+    }
+
+    private func makeScratchOverlay(extent: CGRect, amount: Double, seed: UInt64) -> CIImage? {
+        let image = NSImage(size: extent.size)
+        image.lockFocus()
+        NSColor.clear.setFill()
+        NSRect(origin: .zero, size: extent.size).fill()
+
+        let count = max(1, min(9, Int(amount * 8)))
+        for index in 0..<count {
+            let xSeed = Double((seed &+ UInt64(index * 7919)) % 10_000) / 10_000
+            let x = extent.width * CGFloat(xSeed)
+            let alpha = CGFloat(min(0.22, 0.05 + amount * 0.08))
+            NSColor(calibratedWhite: 0.92, alpha: alpha).setStroke()
+            let path = NSBezierPath()
+            path.lineWidth = CGFloat(0.45 + amount * 0.75)
+            path.move(to: NSPoint(x: x, y: extent.height * CGFloat(0.05 + 0.1 * xSeed)))
+            path.line(to: NSPoint(x: x + CGFloat((xSeed - 0.5) * 18), y: extent.height * CGFloat(0.86 + 0.1 * (1 - xSeed))))
+            path.stroke()
+        }
+
+        image.unlockFocus()
+        return ciImage(from: image)
     }
 }
 
@@ -908,35 +951,53 @@ struct PaletteStage: PipelineStage {
 struct DateStampStage: PipelineStage {
     func render(_ image: CIImage, context: RenderContext) throws -> CIImage {
         guard context.profile.recipe.output.dateStamp else { return image }
+        let style = context.profile.recipe.output.dateStampStyle
         let extent = image.extent.integral
         let formatter = DateFormatter()
-        formatter.dateFormat = "yy  MM dd"
+        formatter.dateFormat = style == .yellowDigital ? "MM dd yy" : "yy  MM dd"
         let text = formatter.string(from: Date())
-        let fontSize = max(18, min(extent.width, extent.height) * 0.035)
-        guard let stamp = makeStamp(text: text, fontSize: fontSize) else { return image }
+        let stampScale: CGFloat = switch style {
+        case .verticalRed:
+            0.026
+        case .yellowDigital:
+            0.03
+        case .classic:
+            0.035
+        }
+        let fontSize = max(16, min(extent.width, extent.height) * stampScale)
+        guard let stamp = makeStamp(text: text) else { return image }
 
         let scale = fontSize / 28
-        let stampImage = stamp
+        var stampImage = stamp
             .transformed(by: CGAffineTransform(scaleX: scale, y: scale))
             .applyingFilterIfAvailable("CIColorMatrix", parameters: [
-                "inputRVector": CIVector(x: 1.0, y: 0, z: 0, w: 0),
-                "inputGVector": CIVector(x: 0, y: 0.72, z: 0, w: 0),
-                "inputBVector": CIVector(x: 0, y: 0, z: 0.08, w: 0),
-                "inputAVector": CIVector(x: 0, y: 0, z: 0, w: 0.86),
-                "inputBiasVector": CIVector(x: 0.08, y: 0.02, z: 0, w: 0)
+                "inputRVector": CIVector(x: stampRed(style), y: 0, z: 0, w: 0),
+                "inputGVector": CIVector(x: 0, y: stampGreen(style), z: 0, w: 0),
+                "inputBVector": CIVector(x: 0, y: 0, z: stampBlue(style), w: 0),
+                "inputAVector": CIVector(x: 0, y: 0, z: 0, w: stampAlpha(style)),
+                "inputBiasVector": CIVector(x: stampBiasRed(style), y: stampBiasGreen(style), z: 0, w: 0)
             ])
 
         let margin = max(16, min(extent.width, extent.height) * 0.035)
-        let placed = stampImage.transformed(by: CGAffineTransform(
-            translationX: extent.maxX - stampImage.extent.width - margin,
-            y: extent.minY + margin
-        ))
+        let placed: CIImage
+        if style == .verticalRed {
+            stampImage = stampImage.transformed(by: CGAffineTransform(rotationAngle: -.pi / 2))
+            placed = stampImage.transformed(by: CGAffineTransform(
+                translationX: extent.minX + margin * 0.78,
+                y: extent.minY + margin + stampImage.extent.height
+            ))
+        } else {
+            placed = stampImage.transformed(by: CGAffineTransform(
+                translationX: extent.maxX - stampImage.extent.width - margin,
+                y: extent.minY + margin
+            ))
+        }
         return placed.applyingFilterIfAvailable("CISourceOverCompositing", parameters: [
             "inputBackgroundImage": image
         ]).cropped(to: extent)
     }
 
-    private func makeStamp(text: String, fontSize: CGFloat) -> CIImage? {
+    private func makeStamp(text: String) -> CIImage? {
         let attributes: [NSAttributedString.Key: Any] = [
             .font: NSFont.monospacedDigitSystemFont(ofSize: 28, weight: .semibold),
             .foregroundColor: NSColor.white
@@ -949,12 +1010,15 @@ struct DateStampStage: PipelineStage {
         NSRect(origin: .zero, size: image.size).fill()
         string.draw(at: NSPoint(x: 5, y: 4))
         image.unlockFocus()
-        guard let tiff = image.tiffRepresentation,
-              let bitmap = NSBitmapImageRep(data: tiff),
-              let cgImage = bitmap.cgImage
-        else { return nil }
-        return CIImage(cgImage: cgImage)
+        return ciImage(from: image)
     }
+
+    private func stampRed(_ style: OutputRecipe.DateStampStyle) -> CGFloat { style == .yellowDigital ? 1 : 1 }
+    private func stampGreen(_ style: OutputRecipe.DateStampStyle) -> CGFloat { style == .verticalRed ? 0.22 : 0.72 }
+    private func stampBlue(_ style: OutputRecipe.DateStampStyle) -> CGFloat { style == .verticalRed ? 0.08 : 0.08 }
+    private func stampAlpha(_ style: OutputRecipe.DateStampStyle) -> CGFloat { style == .verticalRed ? 0.82 : 0.86 }
+    private func stampBiasRed(_ style: OutputRecipe.DateStampStyle) -> CGFloat { style == .verticalRed ? 0.08 : 0.08 }
+    private func stampBiasGreen(_ style: OutputRecipe.DateStampStyle) -> CGFloat { style == .verticalRed ? 0 : 0.02 }
 }
 
 struct BorderStage: PipelineStage {
@@ -964,11 +1028,21 @@ struct BorderStage: PipelineStage {
         let extent = image.extent.integral
         let base = min(extent.width, extent.height)
         let thin = max(16, base * 0.035 * border.amount)
-        let bottomExtra = border.style == .instant ? thin * 2.8 : thin * 0.4
+        let bottomExtra: CGFloat = switch border.style {
+        case .instant:
+            thin * 2.8
+        case .roundedInstant:
+            thin * 4.4
+        case .sprocket35:
+            thin * 0.7
+        default:
+            thin * 0.4
+        }
+        let sideExtra: CGFloat = border.style == .sprocket35 ? thin * 2.3 : 0
         let newExtent = CGRect(
             x: 0,
             y: 0,
-            width: extent.width + thin * 2,
+            width: extent.width + thin * 2 + sideExtra * 2,
             height: extent.height + thin * 2 + bottomExtra
         )
 
@@ -976,6 +1050,10 @@ struct BorderStage: PipelineStage {
         switch border.style {
         case .instant:
             paper = constantColorImage(red: 0.94, green: 0.91, blue: 0.84, alpha: 1, extent: newExtent)
+        case .roundedInstant:
+            paper = constantColorImage(red: 0.965, green: 0.952, blue: 0.91, alpha: 1, extent: newExtent)
+        case .sprocket35, .circleFisheye:
+            paper = constantColorImage(red: 0.008, green: 0.008, blue: 0.009, alpha: 1, extent: newExtent)
         case .print, .halfFrame:
             paper = constantColorImage(red: 0.08, green: 0.075, blue: 0.065, alpha: 1, extent: newExtent)
         case .thin:
@@ -984,9 +1062,95 @@ struct BorderStage: PipelineStage {
             return image
         }
 
-        let placed = image.transformed(by: CGAffineTransform(translationX: thin - extent.minX, y: thin + bottomExtra - extent.minY))
-        return placed.applyingFilterIfAvailable("CISourceOverCompositing", parameters: [
+        let placed = image.transformed(by: CGAffineTransform(translationX: thin + sideExtra - extent.minX, y: thin + bottomExtra - extent.minY))
+        var output = placed.applyingFilterIfAvailable("CISourceOverCompositing", parameters: [
             "inputBackgroundImage": paper
         ]).cropped(to: newExtent)
+
+        if border.style == .roundedInstant {
+            output = output
+                .applyingFilterIfAvailable("CIPhotoEffectFade", parameters: [:])
+                .cropped(to: newExtent)
+            if let overlay = makeInstantCardOverlay(extent: newExtent, imageRect: placed.extent, border: thin) {
+                output = overlay.applyingFilterIfAvailable("CISourceOverCompositing", parameters: [
+                    "inputBackgroundImage": output
+                ]).cropped(to: newExtent)
+            }
+        }
+
+        if border.style == .sprocket35, let overlay = makeSprocketOverlay(extent: newExtent, imageRect: placed.extent, border: thin) {
+            output = overlay.applyingFilterIfAvailable("CISourceOverCompositing", parameters: [
+                "inputBackgroundImage": output
+            ]).cropped(to: newExtent)
+        }
+
+        return output
     }
+
+    private func makeInstantCardOverlay(extent: CGRect, imageRect: CGRect, border: CGFloat) -> CIImage? {
+        let image = NSImage(size: extent.size)
+        image.lockFocus()
+        NSColor.clear.setFill()
+        NSRect(origin: .zero, size: extent.size).fill()
+
+        let inset = border * 0.35
+        let outer = NSRect(x: inset, y: inset, width: extent.width - inset * 2, height: extent.height - inset * 2)
+        NSColor(calibratedWhite: 0.82, alpha: 0.16).setStroke()
+        let card = NSBezierPath(roundedRect: outer, xRadius: border * 1.2, yRadius: border * 1.2)
+        card.lineWidth = max(1, border * 0.05)
+        card.stroke()
+
+        let inner = NSRect(x: imageRect.minX, y: imageRect.minY, width: imageRect.width, height: imageRect.height)
+        NSColor(calibratedWhite: 0.05, alpha: 0.12).setStroke()
+        let innerPath = NSBezierPath(roundedRect: inner.insetBy(dx: -1.5, dy: -1.5), xRadius: border * 0.35, yRadius: border * 0.35)
+        innerPath.lineWidth = max(1, border * 0.04)
+        innerPath.stroke()
+        image.unlockFocus()
+        return ciImage(from: image)
+    }
+
+    private func makeSprocketOverlay(extent: CGRect, imageRect: CGRect, border: CGFloat) -> CIImage? {
+        let image = NSImage(size: extent.size)
+        image.lockFocus()
+        NSColor.clear.setFill()
+        NSRect(origin: .zero, size: extent.size).fill()
+
+        let holeWidth = border * 1.05
+        let holeHeight = border * 0.7
+        let gutter = border * 0.72
+        let count = max(6, Int(extent.height / (holeHeight * 2.1)))
+        for side in [CGFloat(gutter), extent.width - gutter - holeWidth] {
+            for index in 0..<count {
+                let y = border * 0.75 + CGFloat(index) * ((extent.height - border * 1.5) / CGFloat(count))
+                NSColor(calibratedWhite: 0.86, alpha: 0.18).setFill()
+                NSBezierPath(roundedRect: NSRect(x: side, y: y, width: holeWidth, height: holeHeight), xRadius: 3, yRadius: 3).fill()
+                NSColor(calibratedWhite: 0.0, alpha: 0.72).setStroke()
+                let holeStroke = NSBezierPath(roundedRect: NSRect(x: side, y: y, width: holeWidth, height: holeHeight), xRadius: 3, yRadius: 3)
+                holeStroke.lineWidth = 1
+                holeStroke.stroke()
+            }
+        }
+
+        let attrs: [NSAttributedString.Key: Any] = [
+            .font: NSFont.monospacedDigitSystemFont(ofSize: max(14, border * 0.45), weight: .bold),
+            .foregroundColor: NSColor(calibratedRed: 1, green: 0.56, blue: 0.16, alpha: 0.74)
+        ]
+        NSString(string: "FILM 400").draw(at: NSPoint(x: border * 0.48, y: extent.height - border * 2.2), withAttributes: attrs)
+        NSString(string: "135").draw(at: NSPoint(x: extent.width - border * 2.15, y: border * 1.35), withAttributes: attrs)
+
+        NSColor(calibratedWhite: 1, alpha: 0.08).setStroke()
+        let frame = NSBezierPath(rect: NSRect(x: imageRect.minX, y: imageRect.minY, width: imageRect.width, height: imageRect.height))
+        frame.lineWidth = max(1, border * 0.04)
+        frame.stroke()
+        image.unlockFocus()
+        return ciImage(from: image)
+    }
+}
+
+private func ciImage(from image: NSImage) -> CIImage? {
+    guard let tiff = image.tiffRepresentation,
+          let bitmap = NSBitmapImageRep(data: tiff),
+          let cgImage = bitmap.cgImage
+    else { return nil }
+    return CIImage(cgImage: cgImage)
 }

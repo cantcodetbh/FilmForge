@@ -3,6 +3,7 @@ import Foundation
 
 enum ProfileCatalog {
     static let cameras: [CameraProfile] = [
+        referenceLooks,
         canonAE1,
         contaxT2,
         yashicaT4,
@@ -44,6 +45,8 @@ enum ProfileCatalog {
 
     static func defaultFilm(for camera: CameraProfile) -> FilmStock {
         switch camera.format {
+        case .referenceLook:
+            return authoredFilms(for: camera).first ?? portra400
         case .instant:
             return instantColor
         case .ccd:
@@ -104,13 +107,178 @@ enum ProfileCatalog {
                 fade: camera.format == .instant ? 0.12 : 0,
                 softness: 1,
                 dust: camera.format == .toy || camera.format == .disposable ? 1 : 0.65,
-                borderEnabled: camera.recipe.border.style != .none
+                borderEnabled: recipe.border.style != .none
             )
         )
     }
 
     private static func authoredFilms(for camera: CameraProfile) -> [FilmStock] {
         switch camera.id {
+        case referenceLooks.id:
+            return [
+                authoredFilm(camera: camera, stock: portra400, suffix: "pastel-garden", name: "Pastel Garden", tagline: "Airy Dazz-style daylight") {
+                    $0.color.exposure += 0.22
+                    $0.color.brightness += 0.03
+                    $0.color.contrast *= 0.86
+                    $0.color.saturation *= 0.92
+                    $0.color.temperature -= 0.06
+                    $0.color.tint += 0.04
+                    $0.color.redBias *= 1.03
+                    $0.color.greenBias *= 1.04
+                    $0.color.blueBias *= 1.08
+                    $0.color.shadowBlue += 0.14
+                    $0.color.highlightBlue += 0.2
+                    $0.tone = curve(0.08, 0.3, 0.56, 0.83, 0.94)
+                    $0.print = print(.minilab, contrast: 0.9, saturation: 0.94, black: 0.08, white: 0.9, cyan: -0.05, magenta: 0.04, yellow: -0.08, warmth: 0.06, tint: 0.08)
+                    $0.filmResponse.over.highlightCompression = 0.92
+                    $0.filmResponse.normal.shadowLift = 0.08
+                    $0.grain.amount = 0.2
+                    $0.grain.scale = 0.58
+                    $0.bloom.amount = 0.14
+                    $0.halation.amount = 0.1
+                    $0.vignette.amount = 0.1
+                    $0.dust = DustRecipe(amount: 0.06, scratches: 0.035)
+                    $0.border = BorderRecipe(style: .thin, amount: 0.45)
+                },
+                authoredFilm(camera: camera, stock: portra400, suffix: "airy-overexposed", name: "Airy Overexposed", tagline: "Milky sun and soft skin") {
+                    $0.color.exposure += 0.36
+                    $0.color.brightness += 0.04
+                    $0.color.contrast *= 0.74
+                    $0.color.saturation *= 0.82
+                    $0.color.temperature += 0.02
+                    $0.color.tint += 0.06
+                    $0.color.highlightRed += 0.18
+                    $0.color.highlightBlue += 0.26
+                    $0.tone = curve(0.12, 0.34, 0.6, 0.86, 0.9)
+                    $0.print = print(.minilab, contrast: 0.82, saturation: 0.84, black: 0.12, white: 0.86, cyan: -0.03, magenta: 0.04, yellow: -0.08, warmth: 0.1, tint: 0.12)
+                    $0.filmResponse.over.highlightCompression = 0.98
+                    $0.grain.amount = 0.16
+                    $0.bloom.amount = 0.28
+                    $0.halation.amount = 0.18
+                    $0.dust = DustRecipe(amount: 0.045, scratches: 0.02)
+                    $0.border = BorderRecipe(style: .thin, amount: 0.28)
+                },
+                authoredFilm(camera: camera, stock: ektachromeE100, suffix: "blue-couch-slide", name: "Blue Couch Slide", tagline: "Dense cyan shadows") {
+                    $0.color.exposure -= 0.18
+                    $0.color.contrast *= 1.32
+                    $0.color.saturation *= 1.12
+                    $0.color.temperature -= 0.26
+                    $0.color.tint -= 0.04
+                    $0.color.blueBias *= 1.18
+                    $0.color.greenBias *= 1.04
+                    $0.color.redBias *= 0.92
+                    $0.color.shadowBlue += 0.52
+                    $0.color.shadowGreen += 0.24
+                    $0.color.highlightRed += 0.18
+                    $0.tone = curve(0.0, 0.12, 0.45, 0.82, 0.98)
+                    $0.print = print(.slideProjection, contrast: 1.28, saturation: 1.16, black: 0.005, white: 0.96, cyan: 0.12, magenta: -0.04, yellow: -0.12)
+                    $0.filmResponse.under.contrast = 1.42
+                    $0.filmResponse.under.blue *= 1.18
+                    $0.filmResponse.normal.density = 0.62
+                    $0.grain.amount = 0.28
+                    $0.bloom.amount = 0.08
+                    $0.vignette.amount = 0.3
+                    $0.border = BorderRecipe(style: .thin, amount: 0.55)
+                    $0.dust = DustRecipe(amount: 0.05, scratches: 0.045)
+                },
+                authoredFilm(camera: camera, stock: ultramax400, suffix: "soft-window", name: "Soft Window", tagline: "Cool backlit negative") {
+                    $0.color.exposure += 0.04
+                    $0.color.contrast *= 0.88
+                    $0.color.saturation *= 0.82
+                    $0.color.temperature -= 0.18
+                    $0.color.tint -= 0.04
+                    $0.color.shadowBlue += 0.34
+                    $0.color.highlightBlue += 0.18
+                    $0.tone = curve(0.07, 0.28, 0.52, 0.76, 0.92)
+                    $0.print = print(.cheapScan, contrast: 0.9, saturation: 0.82, black: 0.07, white: 0.9, cyan: 0.08, magenta: -0.03, yellow: -0.08)
+                    $0.lens.softness = 0.16
+                    $0.lens.edgeSoftness = 0.2
+                    $0.grain.amount = 0.22
+                    $0.bloom.amount = 0.18
+                    $0.dust = DustRecipe(amount: 0.06, scratches: 0.035)
+                },
+                authoredFilm(camera: camera, stock: ultramax400, suffix: "circle-fisheye-color", name: "Circle Fisheye Color", tagline: "Black lens tunnel and blue rim") {
+                    $0.output.aspect = .threeByTwo
+                    $0.output.dateStamp = true
+                    $0.output.dateStampStyle = .verticalRed
+                    $0.color.contrast *= 1.08
+                    $0.color.saturation *= 1.06
+                    $0.color.temperature -= 0.04
+                    $0.color.shadowBlue += 0.22
+                    $0.color.highlightRed += 0.12
+                    $0.tone = curve(0.02, 0.2, 0.5, 0.82, 0.95)
+                    $0.lens = LensRecipe(softness: 0.08, edgeSoftness: 0.3, sharpen: 0.08, downsample: 0.92, fisheye: .circular(cropped: false, strength: 1.08, imageCircle: 0.92, edgeDarkness: 1.0, edgeBlur: 0.42, chromaticEdge: 0.95))
+                    $0.aberration.amount = 0.65
+                    $0.grain.amount = 0.32
+                    $0.vignette.amount = 0.5
+                    $0.dust = DustRecipe(amount: 0.09, scratches: 0.07)
+                    $0.border = BorderRecipe(style: .circleFisheye, amount: 0.9)
+                },
+                authoredFilm(camera: camera, stock: triX400, suffix: "circle-fisheye-mono", name: "Circle Fisheye Mono", tagline: "Soft black-and-white lens mask") {
+                    $0.output.aspect = .threeByTwo
+                    $0.color.monochrome = true
+                    $0.color.contrast *= 1.18
+                    $0.color.saturation = 0
+                    $0.tone = curve(0.04, 0.24, 0.5, 0.78, 0.92)
+                    $0.print = print(.opticalPrint, contrast: 1.08, saturation: 0, black: 0.035, white: 0.92, warmth: 0.03, tint: 0.03)
+                    $0.lens = LensRecipe(softness: 0.1, edgeSoftness: 0.28, sharpen: 0.05, downsample: 0.92, fisheye: .circular(cropped: false, strength: 1.05, imageCircle: 0.91, edgeDarkness: 1.05, edgeBlur: 0.46, chromaticEdge: 0.28))
+                    $0.grain.amount = 0.38
+                    $0.grain.monochrome = true
+                    $0.dust = DustRecipe(amount: 0.1, scratches: 0.09)
+                    $0.border = BorderRecipe(style: .circleFisheye, amount: 1)
+                },
+                authoredFilm(camera: camera, stock: ultramax400, suffix: "cream-instant-card", name: "Cream Instant Card", tagline: "Rounded instant print") {
+                    $0.output.aspect = .instant
+                    $0.color.exposure += 0.06
+                    $0.color.contrast *= 0.9
+                    $0.color.saturation *= 0.88
+                    $0.color.temperature += 0.12
+                    $0.color.tint += 0.03
+                    $0.tone = curve(0.08, 0.29, 0.52, 0.78, 0.91)
+                    $0.print = print(.instantChemistry, contrast: 0.86, saturation: 0.86, black: 0.08, white: 0.88, yellow: 0.12, warmth: 0.22, tint: 0.14)
+                    $0.lens.softness = 0.1
+                    $0.grain.amount = 0.18
+                    $0.bloom.amount = 0.14
+                    $0.dust = DustRecipe(amount: 0.05, scratches: 0.02)
+                    $0.border = BorderRecipe(style: .roundedInstant, amount: 1)
+                },
+                authoredFilm(camera: camera, stock: portra400, suffix: "135-strip-portrait", name: "135 Strip Portrait", tagline: "Black sprockets and warm skin") {
+                    $0.output.aspect = .threeByTwo
+                    $0.color.contrast *= 1.04
+                    $0.color.saturation *= 0.98
+                    $0.color.temperature += 0.08
+                    $0.color.tint += 0.02
+                    $0.color.highlightRed += 0.14
+                    $0.tone = curve(0.03, 0.22, 0.5, 0.8, 0.94)
+                    $0.print = print(.minilab, contrast: 1.02, saturation: 0.98, black: 0.035, white: 0.92, yellow: 0.06, warmth: 0.1, tint: 0.04)
+                    $0.lens.edgeSoftness = 0.08
+                    $0.grain.amount = 0.22
+                    $0.dust = DustRecipe(amount: 0.055, scratches: 0.05)
+                    $0.border = BorderRecipe(style: .sprocket35, amount: 0.9)
+                },
+                authoredFilm(camera: camera, stock: delta3200, suffix: "low-light-push", name: "Low Light Push", tagline: "Muddy amber underexposure") {
+                    $0.output.aspect = .threeByTwo
+                    $0.color.exposure -= 0.72
+                    $0.color.brightness -= 0.03
+                    $0.color.contrast *= 0.72
+                    $0.color.saturation *= 0.68
+                    $0.color.temperature += 0.46
+                    $0.color.tint += 0.1
+                    $0.color.shadowRed += 0.44
+                    $0.color.shadowGreen += 0.2
+                    $0.color.shadowBlue -= 0.24
+                    $0.tone = curve(0.12, 0.2, 0.38, 0.58, 0.74)
+                    $0.print = print(.cheapScan, contrast: 0.78, saturation: 0.62, black: 0.14, white: 0.72, yellow: 0.24, warmth: 0.34, tint: 0.22)
+                    $0.filmResponse.under.shadowLift = 0.14
+                    $0.filmResponse.under.density = 0.72
+                    $0.grain.amount = 0.76
+                    $0.grain.scale = 1.08
+                    $0.grain.shadows = 1
+                    $0.output.lightLeak = 0.12
+                    $0.dust = DustRecipe(amount: 0.12, scratches: 0.16)
+                    $0.lens.downsample = 0.78
+                }
+            ]
         case canonAE1.id:
             return [
                 authoredFilm(camera: camera, stock: portra400, suffix: "portra", name: "Portra 400 AE", tagline: "Warm SLR negative") {
@@ -593,6 +761,30 @@ enum ProfileCatalog {
     }
 
     // MARK: Cameras
+
+    static let referenceLooks = CameraProfile(
+        id: "reference-look-pack",
+        displayName: "Film Looks",
+        reference: "Dazz Cam reference deconstruction look pack",
+        format: .referenceLook,
+        tagline: "Finished film-photo targets",
+        description: "A set of opinionated film-app looks built from the supplied Dazz Cam references: physical frames, lens tunnels, scan texture, density shifts, dust, and print-like color.",
+        accent: ProfileAccent(red: 0.92, green: 0.72, blue: 0.58),
+        recipe: cameraRecipe(
+            capture: capture(.rawNatural, dynamicRange: 0.9, sensorClip: 0.18, hdr: 0.26, sharpening: 0.04, noise: 0.12),
+            print: print(.minilab, contrast: 1, saturation: 1, black: 0.04, white: 0.92, warmth: 0.08, tint: 0.04),
+            color: color(exposure: 0, contrast: 1, saturation: 1, temperature: 0, red: 1, green: 1, blue: 1),
+            tone: curve(0.04, 0.24, 0.5, 0.78, 0.94),
+            grain: GrainRecipe(amount: 0.12, scale: 0.45, monochrome: false, shadows: 0.3, highlights: 0.16),
+            bloom: 0.04,
+            halation: 0.04,
+            vignette: 0.08,
+            lens: LensRecipe(softness: 0.02, edgeSoftness: 0.04, sharpen: 0.04, downsample: 0.98),
+            aberration: 0.08,
+            dust: 0.03,
+            border: .none
+        )
+    )
 
     static let canonAE1 = CameraProfile(
         id: "canon-ae1-reference",
@@ -1269,6 +1461,8 @@ enum ProfileCatalog {
 
     private static func defaultAspect(for camera: CameraProfile) -> OutputRecipe.Aspect {
         switch camera.format {
+        case .referenceLook:
+            .original
         case .thirtyFive, .disposable, .toy:
             .threeByTwo
         case .medium120, .instant:
@@ -1448,7 +1642,7 @@ enum ProfileCatalog {
     }
 
     private static func defaultPrint(for color: ColorRecipe, monochrome: Bool, border: BorderRecipe.Style) -> PrintRecipe {
-        if border == .instant {
+        if border == .instant || border == .roundedInstant {
             return print(.instantChemistry, contrast: 0.88, saturation: 0.9, black: 0.06, white: 0.92, yellow: 0.16, warmth: 0.22, tint: 0.18)
         }
         if monochrome {
@@ -1571,6 +1765,7 @@ enum RecipeComposer {
                 palette: film.output.palette == .natural ? camera.output.palette : film.output.palette,
                 posterizeLevels: max(camera.output.posterizeLevels, film.output.posterizeLevels),
                 dateStamp: camera.output.dateStamp || film.output.dateStamp,
+                dateStampStyle: film.output.dateStamp ? film.output.dateStampStyle : camera.output.dateStampStyle,
                 flashFalloff: camera.output.flashFalloff + film.output.flashFalloff,
                 labControlsEnabled: camera.output.labControlsEnabled || film.output.labControlsEnabled,
                 jpegCrunch: camera.output.jpegCrunch + film.output.jpegCrunch,
