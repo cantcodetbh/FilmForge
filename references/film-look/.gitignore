@@ -1,8 +1,0 @@
-# Keep third-party research references local by default.
-*.jpg
-*.jpeg
-*.png
-*.webp
-
-!MANIFEST.md
-!.gitignore
