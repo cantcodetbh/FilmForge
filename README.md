@@ -1,6 +1,6 @@
 # FilmForge
 
-FilmForge is a macOS film-camera editor built in SwiftUI and Core Image. It is tuned around disposable cameras, HUJI-style date-stamped phone-film looks, Dazz-style app-camera processing, lab print fade, halation, bloom, grain, lens softness, leaks, dust, and compact-camera colour response.
+FilmForge is a macOS film-camera editor built in SwiftUI and Core Image. It is tuned around disposable/film cameras.
 
 ![FilmForge app](docs/screenshots/filmforge-app.png)
 
