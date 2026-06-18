@@ -7,38 +7,54 @@
 	objects = {
 
 /* Begin PBXBuildFile section */
-		0A2DB026E5A857D57C26F906 /* EditorViewModel.swift in Sources */ = {isa = PBXBuildFile; fileRef = AD551C460BB7635BACDF7148 /* EditorViewModel.swift */; };
-		19AE0D4A4B6B7751B0C3CA81 /* FilmForgeApp.swift in Sources */ = {isa = PBXBuildFile; fileRef = D088779A716E1F91CB069F1C /* FilmForgeApp.swift */; };
-		3F1C4B0A123B0A674ABD211E /* RenderContext.swift in Sources */ = {isa = PBXBuildFile; fileRef = 7B8A96F67BBD052C19916C9A /* RenderContext.swift */; };
-		413B980261B0C42AF158A548 /* LUTEngine.swift in Sources */ = {isa = PBXBuildFile; fileRef = 37EC9612437E9344FAD88E3B /* LUTEngine.swift */; };
-		64346CA3934CDA28356B6D90 /* PreviewRenderer.swift in Sources */ = {isa = PBXBuildFile; fileRef = 2732612BB39195F6857CDE82 /* PreviewRenderer.swift */; };
-		79005571A0DAB5B0FFDAA85D /* FilmModels.swift in Sources */ = {isa = PBXBuildFile; fileRef = 395E1AFBDB34447D5447E1FF /* FilmModels.swift */; };
-		852A1D78A83967A48A755150 /* CIFilter+Helpers.swift in Sources */ = {isa = PBXBuildFile; fileRef = 41941F844BA9C5E368EC031D /* CIFilter+Helpers.swift */; };
-		8AC551CFC2E5A6E60E79F50C /* ExportService.swift in Sources */ = {isa = PBXBuildFile; fileRef = 533C4B16795A44FE7AE979C8 /* ExportService.swift */; };
-		938D5C85875F080E9D7796EF /* ImagePipeline.swift in Sources */ = {isa = PBXBuildFile; fileRef = 270B69337E3A0163763543FF /* ImagePipeline.swift */; };
-		A485AF99E94199C4C55009B0 /* RenderWorker.swift in Sources */ = {isa = PBXBuildFile; fileRef = B55A41E17FC75DD4FDC2D27B /* RenderWorker.swift */; };
-		C2F8B68B6AA74DE3269711F7 /* ImageImportService.swift in Sources */ = {isa = PBXBuildFile; fileRef = ECE4649EC97F34F616B52BEA /* ImageImportService.swift */; };
-		CADC106164716ED0420CB9ED /* ProfileCatalog.swift in Sources */ = {isa = PBXBuildFile; fileRef = DA237B51555212D7B17BB6DE /* ProfileCatalog.swift */; };
-		DF48ED28F892D8B33245662C /* EditorView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 22445A94CA993BD9E6B8423A /* EditorView.swift */; };
-		FE1EBE0A27282AF24A8B8291 /* CustomKernels.swift in Sources */ = {isa = PBXBuildFile; fileRef = 2048762BA362C6605B3C59AC /* CustomKernels.swift */; };
+		0275E167F165A113542A358B /* ExportService.swift in Sources */ = {isa = PBXBuildFile; fileRef = CAF12635F0425AB160DE5CB8 /* ExportService.swift */; };
+		09B393130EC8DD2C9650AA61 /* FilmLookProfile.swift in Sources */ = {isa = PBXBuildFile; fileRef = 62632B8E872F1139569263AB /* FilmLookProfile.swift */; };
+		0B9CCC38F441BBE76D2EC3E4 /* LUTLoader.swift in Sources */ = {isa = PBXBuildFile; fileRef = 8075A33766750ED0E67A965C /* LUTLoader.swift */; };
+		14BBF4C85E33793F8B1A6143 /* HaldCLUTLoader.swift in Sources */ = {isa = PBXBuildFile; fileRef = BA167E9CF00F290D550437D2 /* HaldCLUTLoader.swift */; };
+		303BD405C19AB188BC411AB8 /* LensImperfectionFilter.swift in Sources */ = {isa = PBXBuildFile; fileRef = 7D2F65721CD0BD241976EE4D /* LensImperfectionFilter.swift */; };
+		30F6DE095AF3797DF056E4A5 /* SceneAnalyzer.swift in Sources */ = {isa = PBXBuildFile; fileRef = B7FFD1A6D43B7BC5335BB979 /* SceneAnalyzer.swift */; };
+		408FD6435841BEF813051858 /* GrainFilter.swift in Sources */ = {isa = PBXBuildFile; fileRef = 1DDC2816097CE9E9B368254F /* GrainFilter.swift */; };
+		68F9380039BC72E75A3AEE9D /* PresetStripView.swift in Sources */ = {isa = PBXBuildFile; fileRef = EF671B15AB75B8E8E6765B72 /* PresetStripView.swift */; };
+		6DB002BFB24131CCB7907F32 /* HalationFilter.swift in Sources */ = {isa = PBXBuildFile; fileRef = 363C3762BFC99A2CD304A3E5 /* HalationFilter.swift */; };
+		80AC2DBE714B72B0C90E574F /* ImageImportService.swift in Sources */ = {isa = PBXBuildFile; fileRef = FF7BEA468FD796DB72A30777 /* ImageImportService.swift */; };
+		84BF0B059613E8EDF4094298 /* FilmPipeline.swift in Sources */ = {isa = PBXBuildFile; fileRef = 206E95820878F7D6ED685756 /* FilmPipeline.swift */; };
+		9AB291342C40971BFE785712 /* FilmForgeApp.swift in Sources */ = {isa = PBXBuildFile; fileRef = D0E721E6E6C45C56A684EEAC /* FilmForgeApp.swift */; };
+		9E28FD267110069D8F92B73E /* ProfileCatalog.swift in Sources */ = {isa = PBXBuildFile; fileRef = 48AA87CE059ADFE1D32F5319 /* ProfileCatalog.swift */; };
+		A325776F06A975E035086657 /* ContentView.swift in Sources */ = {isa = PBXBuildFile; fileRef = DD191A141E8FDE911B6412B1 /* ContentView.swift */; };
+		ADD8218290D78F2235A270D2 /* ReferenceAnalyzer.swift in Sources */ = {isa = PBXBuildFile; fileRef = 023D543C8467B5468A8F6EE8 /* ReferenceAnalyzer.swift */; };
+		AE96B2C265E2331F408CD380 /* BloomFilter.swift in Sources */ = {isa = PBXBuildFile; fileRef = C0F6FE6E4DE5120F8C34EAE3 /* BloomFilter.swift */; };
+		B4A9565A5B7EE8AB65B4A826 /* ToneCurveFilter.swift in Sources */ = {isa = PBXBuildFile; fileRef = BAA7CB1E2838508A2AE87066 /* ToneCurveFilter.swift */; };
+		C6FDD010129AAB0D9683B637 /* CubeLUTParser.swift in Sources */ = {isa = PBXBuildFile; fileRef = 8F21E1BF46B698E803B63C69 /* CubeLUTParser.swift */; };
+		D0D17EC85793714360B2C2E5 /* PreviewRenderer.swift in Sources */ = {isa = PBXBuildFile; fileRef = 33B4C5507265709E440D21D8 /* PreviewRenderer.swift */; };
+		E7FAD9BB1536CA2E75D6346D /* DigitalTamingFilter.swift in Sources */ = {isa = PBXBuildFile; fileRef = E78147ED5C40C3F181605325 /* DigitalTamingFilter.swift */; };
+		F23073C42393324AF4BDBE93 /* AdvancedControlsView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 7AAC1FE56490EC255DBEAB13 /* AdvancedControlsView.swift */; };
+		F7B05C7DEC5A760B9E7BA8B4 /* EditorViewModel.swift in Sources */ = {isa = PBXBuildFile; fileRef = 40624C577D525E77FF0DA35D /* EditorViewModel.swift */; };
 /* End PBXBuildFile section */
 
 /* Begin PBXFileReference section */
-		2048762BA362C6605B3C59AC /* CustomKernels.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = CustomKernels.swift; sourceTree = "<group>"; };
-		22445A94CA993BD9E6B8423A /* EditorView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = EditorView.swift; sourceTree = "<group>"; };
-		270B69337E3A0163763543FF /* ImagePipeline.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ImagePipeline.swift; sourceTree = "<group>"; };
-		2732612BB39195F6857CDE82 /* PreviewRenderer.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = PreviewRenderer.swift; sourceTree = "<group>"; };
-		37EC9612437E9344FAD88E3B /* LUTEngine.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = LUTEngine.swift; sourceTree = "<group>"; };
-		395E1AFBDB34447D5447E1FF /* FilmModels.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = FilmModels.swift; sourceTree = "<group>"; };
-		41941F844BA9C5E368EC031D /* CIFilter+Helpers.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = "CIFilter+Helpers.swift"; sourceTree = "<group>"; };
-		533C4B16795A44FE7AE979C8 /* ExportService.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ExportService.swift; sourceTree = "<group>"; };
-		7B8A96F67BBD052C19916C9A /* RenderContext.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = RenderContext.swift; sourceTree = "<group>"; };
-		AD551C460BB7635BACDF7148 /* EditorViewModel.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = EditorViewModel.swift; sourceTree = "<group>"; };
-		B55A41E17FC75DD4FDC2D27B /* RenderWorker.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = RenderWorker.swift; sourceTree = "<group>"; };
+		023D543C8467B5468A8F6EE8 /* ReferenceAnalyzer.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ReferenceAnalyzer.swift; sourceTree = "<group>"; };
+		1DDC2816097CE9E9B368254F /* GrainFilter.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = GrainFilter.swift; sourceTree = "<group>"; };
+		206E95820878F7D6ED685756 /* FilmPipeline.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = FilmPipeline.swift; sourceTree = "<group>"; };
+		33B4C5507265709E440D21D8 /* PreviewRenderer.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = PreviewRenderer.swift; sourceTree = "<group>"; };
+		363C3762BFC99A2CD304A3E5 /* HalationFilter.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = HalationFilter.swift; sourceTree = "<group>"; };
+		40624C577D525E77FF0DA35D /* EditorViewModel.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = EditorViewModel.swift; sourceTree = "<group>"; };
+		48AA87CE059ADFE1D32F5319 /* ProfileCatalog.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ProfileCatalog.swift; sourceTree = "<group>"; };
+		62632B8E872F1139569263AB /* FilmLookProfile.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = FilmLookProfile.swift; sourceTree = "<group>"; };
+		7AAC1FE56490EC255DBEAB13 /* AdvancedControlsView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = AdvancedControlsView.swift; sourceTree = "<group>"; };
+		7D2F65721CD0BD241976EE4D /* LensImperfectionFilter.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = LensImperfectionFilter.swift; sourceTree = "<group>"; };
+		8075A33766750ED0E67A965C /* LUTLoader.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = LUTLoader.swift; sourceTree = "<group>"; };
+		8F21E1BF46B698E803B63C69 /* CubeLUTParser.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = CubeLUTParser.swift; sourceTree = "<group>"; };
+		B7FFD1A6D43B7BC5335BB979 /* SceneAnalyzer.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SceneAnalyzer.swift; sourceTree = "<group>"; };
+		BA167E9CF00F290D550437D2 /* HaldCLUTLoader.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = HaldCLUTLoader.swift; sourceTree = "<group>"; };
+		BAA7CB1E2838508A2AE87066 /* ToneCurveFilter.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ToneCurveFilter.swift; sourceTree = "<group>"; };
+		C0F6FE6E4DE5120F8C34EAE3 /* BloomFilter.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = BloomFilter.swift; sourceTree = "<group>"; };
 		C6FD3A74E75DCE2A6C5F09BC /* FilmForge.app */ = {isa = PBXFileReference; explicitFileType = wrapper.application; includeInIndex = 0; path = FilmForge.app; sourceTree = BUILT_PRODUCTS_DIR; };
-		D088779A716E1F91CB069F1C /* FilmForgeApp.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = FilmForgeApp.swift; sourceTree = "<group>"; };
-		DA237B51555212D7B17BB6DE /* ProfileCatalog.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ProfileCatalog.swift; sourceTree = "<group>"; };
-		ECE4649EC97F34F616B52BEA /* ImageImportService.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ImageImportService.swift; sourceTree = "<group>"; };
+		CAF12635F0425AB160DE5CB8 /* ExportService.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ExportService.swift; sourceTree = "<group>"; };
+		D0E721E6E6C45C56A684EEAC /* FilmForgeApp.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = FilmForgeApp.swift; sourceTree = "<group>"; };
+		DD191A141E8FDE911B6412B1 /* ContentView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ContentView.swift; sourceTree = "<group>"; };
+		E78147ED5C40C3F181605325 /* DigitalTamingFilter.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = DigitalTamingFilter.swift; sourceTree = "<group>"; };
+		EF671B15AB75B8E8E6765B72 /* PresetStripView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = PresetStripView.swift; sourceTree = "<group>"; };
+		FF7BEA468FD796DB72A30777 /* ImageImportService.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ImageImportService.swift; sourceTree = "<group>"; };
 /* End PBXFileReference section */
 
 /* Begin PBXGroup section */
@@ -53,22 +69,52 @@
 		14BCE9582606435F46364F90 /* FilmForge */ = {
 			isa = PBXGroup;
 			children = (
-				B127E7298F8B425435668752 /* Resources */,
-				8D0F3C7248E15071C6306575 /* Sources */,
+				639B2A8420007FDBD8211387 /* App */,
+				C93305DA5547AD28E11E7AC7 /* Models */,
+				4E9E029726BD07C7E56A6350 /* Pipeline */,
+				9F63ECA3635FCA81DF17548C /* Profiles */,
+				B4F20D28C666298D4F9F69EF /* Services */,
+				D92A935E578EB76636477B75 /* Tools */,
+				44E4863DD4509C479745CAE8 /* UI */,
 			);
-			path = FilmForge;
+			name = FilmForge;
+			path = Sources/FilmForge;
 			sourceTree = "<group>";
 		};
-		684152582156AF34550465E3 /* Services */ = {
+		44E4863DD4509C479745CAE8 /* UI */ = {
 			isa = PBXGroup;
 			children = (
-				AD551C460BB7635BACDF7148 /* EditorViewModel.swift */,
-				533C4B16795A44FE7AE979C8 /* ExportService.swift */,
-				ECE4649EC97F34F616B52BEA /* ImageImportService.swift */,
-				2732612BB39195F6857CDE82 /* PreviewRenderer.swift */,
-				B55A41E17FC75DD4FDC2D27B /* RenderWorker.swift */,
+				7AAC1FE56490EC255DBEAB13 /* AdvancedControlsView.swift */,
+				DD191A141E8FDE911B6412B1 /* ContentView.swift */,
+				EF671B15AB75B8E8E6765B72 /* PresetStripView.swift */,
 			);
-			path = Services;
+			path = UI;
+			sourceTree = "<group>";
+		};
+		4E9E029726BD07C7E56A6350 /* Pipeline */ = {
+			isa = PBXGroup;
+			children = (
+				C0F6FE6E4DE5120F8C34EAE3 /* BloomFilter.swift */,
+				8F21E1BF46B698E803B63C69 /* CubeLUTParser.swift */,
+				E78147ED5C40C3F181605325 /* DigitalTamingFilter.swift */,
+				206E95820878F7D6ED685756 /* FilmPipeline.swift */,
+				1DDC2816097CE9E9B368254F /* GrainFilter.swift */,
+				363C3762BFC99A2CD304A3E5 /* HalationFilter.swift */,
+				BA167E9CF00F290D550437D2 /* HaldCLUTLoader.swift */,
+				7D2F65721CD0BD241976EE4D /* LensImperfectionFilter.swift */,
+				8075A33766750ED0E67A965C /* LUTLoader.swift */,
+				B7FFD1A6D43B7BC5335BB979 /* SceneAnalyzer.swift */,
+				BAA7CB1E2838508A2AE87066 /* ToneCurveFilter.swift */,
+			);
+			path = Pipeline;
+			sourceTree = "<group>";
+		};
+		639B2A8420007FDBD8211387 /* App */ = {
+			isa = PBXGroup;
+			children = (
+				D0E721E6E6C45C56A684EEAC /* FilmForgeApp.swift */,
+			);
+			path = App;
 			sourceTree = "<group>";
 		};
 		7BA1DBCF6EBCCF3198779D4D /* Products */ = {
@@ -79,68 +125,39 @@
 			name = Products;
 			sourceTree = "<group>";
 		};
-		864E0C39112711ED9107A8DE /* Models */ = {
+		9F63ECA3635FCA81DF17548C /* Profiles */ = {
 			isa = PBXGroup;
 			children = (
-				395E1AFBDB34447D5447E1FF /* FilmModels.swift */,
-			);
-			path = Models;
-			sourceTree = "<group>";
-		};
-		8D0F3C7248E15071C6306575 /* Sources */ = {
-			isa = PBXGroup;
-			children = (
-				955C2BE073F1BDB2963FC5B8 /* App */,
-				864E0C39112711ED9107A8DE /* Models */,
-				C35EF3D5123A0C98F4B6B472 /* Pipeline */,
-				C2E57C4BA251CC16DA5511DD /* Profiles */,
-				684152582156AF34550465E3 /* Services */,
-				C9B36D1B2AF198EFD922F29C /* UI */,
-			);
-			path = Sources;
-			sourceTree = "<group>";
-		};
-		955C2BE073F1BDB2963FC5B8 /* App */ = {
-			isa = PBXGroup;
-			children = (
-				D088779A716E1F91CB069F1C /* FilmForgeApp.swift */,
-			);
-			path = App;
-			sourceTree = "<group>";
-		};
-		B127E7298F8B425435668752 /* Resources */ = {
-			isa = PBXGroup;
-			children = (
-			);
-			path = Resources;
-			sourceTree = "<group>";
-		};
-		C2E57C4BA251CC16DA5511DD /* Profiles */ = {
-			isa = PBXGroup;
-			children = (
-				DA237B51555212D7B17BB6DE /* ProfileCatalog.swift */,
+				48AA87CE059ADFE1D32F5319 /* ProfileCatalog.swift */,
 			);
 			path = Profiles;
 			sourceTree = "<group>";
 		};
-		C35EF3D5123A0C98F4B6B472 /* Pipeline */ = {
+		B4F20D28C666298D4F9F69EF /* Services */ = {
 			isa = PBXGroup;
 			children = (
-				41941F844BA9C5E368EC031D /* CIFilter+Helpers.swift */,
-				2048762BA362C6605B3C59AC /* CustomKernels.swift */,
-				270B69337E3A0163763543FF /* ImagePipeline.swift */,
-				37EC9612437E9344FAD88E3B /* LUTEngine.swift */,
-				7B8A96F67BBD052C19916C9A /* RenderContext.swift */,
+				40624C577D525E77FF0DA35D /* EditorViewModel.swift */,
+				CAF12635F0425AB160DE5CB8 /* ExportService.swift */,
+				FF7BEA468FD796DB72A30777 /* ImageImportService.swift */,
+				33B4C5507265709E440D21D8 /* PreviewRenderer.swift */,
 			);
-			path = Pipeline;
+			path = Services;
 			sourceTree = "<group>";
 		};
-		C9B36D1B2AF198EFD922F29C /* UI */ = {
+		C93305DA5547AD28E11E7AC7 /* Models */ = {
 			isa = PBXGroup;
 			children = (
-				22445A94CA993BD9E6B8423A /* EditorView.swift */,
+				62632B8E872F1139569263AB /* FilmLookProfile.swift */,
 			);
-			path = UI;
+			path = Models;
+			sourceTree = "<group>";
+		};
+		D92A935E578EB76636477B75 /* Tools */ = {
+			isa = PBXGroup;
+			children = (
+				023D543C8467B5468A8F6EE8 /* ReferenceAnalyzer.swift */,
+			);
+			path = Tools;
 			sourceTree = "<group>";
 		};
 /* End PBXGroup section */
@@ -173,7 +190,7 @@
 				LastUpgradeCheck = 1430;
 				TargetAttributes = {
 					001CF775D9807BF1DDD50E2A = {
-						DevelopmentTeam = "";
+						DevelopmentTeam = H9GD4A7SQF;
 						ProvisioningStyle = Automatic;
 					};
 				};
@@ -202,20 +219,28 @@
 			isa = PBXSourcesBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
-				852A1D78A83967A48A755150 /* CIFilter+Helpers.swift in Sources */,
-				FE1EBE0A27282AF24A8B8291 /* CustomKernels.swift in Sources */,
-				DF48ED28F892D8B33245662C /* EditorView.swift in Sources */,
-				0A2DB026E5A857D57C26F906 /* EditorViewModel.swift in Sources */,
-				8AC551CFC2E5A6E60E79F50C /* ExportService.swift in Sources */,
-				19AE0D4A4B6B7751B0C3CA81 /* FilmForgeApp.swift in Sources */,
-				79005571A0DAB5B0FFDAA85D /* FilmModels.swift in Sources */,
-				C2F8B68B6AA74DE3269711F7 /* ImageImportService.swift in Sources */,
-				938D5C85875F080E9D7796EF /* ImagePipeline.swift in Sources */,
-				413B980261B0C42AF158A548 /* LUTEngine.swift in Sources */,
-				64346CA3934CDA28356B6D90 /* PreviewRenderer.swift in Sources */,
-				CADC106164716ED0420CB9ED /* ProfileCatalog.swift in Sources */,
-				3F1C4B0A123B0A674ABD211E /* RenderContext.swift in Sources */,
-				A485AF99E94199C4C55009B0 /* RenderWorker.swift in Sources */,
+				F23073C42393324AF4BDBE93 /* AdvancedControlsView.swift in Sources */,
+				AE96B2C265E2331F408CD380 /* BloomFilter.swift in Sources */,
+				A325776F06A975E035086657 /* ContentView.swift in Sources */,
+				C6FDD010129AAB0D9683B637 /* CubeLUTParser.swift in Sources */,
+				E7FAD9BB1536CA2E75D6346D /* DigitalTamingFilter.swift in Sources */,
+				F7B05C7DEC5A760B9E7BA8B4 /* EditorViewModel.swift in Sources */,
+				0275E167F165A113542A358B /* ExportService.swift in Sources */,
+				9AB291342C40971BFE785712 /* FilmForgeApp.swift in Sources */,
+				09B393130EC8DD2C9650AA61 /* FilmLookProfile.swift in Sources */,
+				84BF0B059613E8EDF4094298 /* FilmPipeline.swift in Sources */,
+				408FD6435841BEF813051858 /* GrainFilter.swift in Sources */,
+				6DB002BFB24131CCB7907F32 /* HalationFilter.swift in Sources */,
+				14BBF4C85E33793F8B1A6143 /* HaldCLUTLoader.swift in Sources */,
+				80AC2DBE714B72B0C90E574F /* ImageImportService.swift in Sources */,
+				0B9CCC38F441BBE76D2EC3E4 /* LUTLoader.swift in Sources */,
+				303BD405C19AB188BC411AB8 /* LensImperfectionFilter.swift in Sources */,
+				68F9380039BC72E75A3AEE9D /* PresetStripView.swift in Sources */,
+				D0D17EC85793714360B2C2E5 /* PreviewRenderer.swift in Sources */,
+				9E28FD267110069D8F92B73E /* ProfileCatalog.swift in Sources */,
+				ADD8218290D78F2235A270D2 /* ReferenceAnalyzer.swift in Sources */,
+				30F6DE095AF3797DF056E4A5 /* SceneAnalyzer.swift in Sources */,
+				B4A9565A5B7EE8AB65B4A826 /* ToneCurveFilter.swift in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -255,8 +280,13 @@
 				CLANG_WARN_UNGUARDED_AVAILABILITY = YES_AGGRESSIVE;
 				CLANG_WARN_UNREACHABLE_CODE = YES;
 				CLANG_WARN__DUPLICATE_METHOD_MATCH = YES;
+				CODE_SIGN_IDENTITY = "Apple Development";
+				CODE_SIGN_STYLE = Automatic;
 				COPY_PHASE_STRIP = NO;
+				CURRENT_PROJECT_VERSION = 1;
 				DEBUG_INFORMATION_FORMAT = "dwarf-with-dsym";
+				DEVELOPMENT_TEAM = H9GD4A7SQF;
+				ENABLE_HARDENED_RUNTIME = YES;
 				ENABLE_NS_ASSERTIONS = NO;
 				ENABLE_STRICT_OBJC_MSGSEND = YES;
 				GCC_C_LANGUAGE_STANDARD = gnu11;
@@ -267,34 +297,38 @@
 				GCC_WARN_UNINITIALIZED_AUTOS = YES_AGGRESSIVE;
 				GCC_WARN_UNUSED_FUNCTION = YES;
 				GCC_WARN_UNUSED_VARIABLE = YES;
-				MACOSX_DEPLOYMENT_TARGET = 14.0;
+				MACOSX_DEPLOYMENT_TARGET = 13.0;
+				MARKETING_VERSION = 1.0.0;
 				MTL_ENABLE_DEBUG_INFO = NO;
 				MTL_FAST_MATH = YES;
+				PRODUCT_BUNDLE_IDENTIFIER = com.tankywozere.FilmForge;
 				PRODUCT_NAME = "$(TARGET_NAME)";
 				SDKROOT = macosx;
 				SWIFT_COMPILATION_MODE = wholemodule;
 				SWIFT_OPTIMIZATION_LEVEL = "-O";
-				SWIFT_VERSION = 6.0;
+				SWIFT_VERSION = 5.0;
 			};
 			name = Release;
 		};
 		C97AD78780D6BAB5838B626A /* Debug */ = {
 			isa = XCBuildConfiguration;
 			buildSettings = {
-				ASSETCATALOG_COMPILER_APPICON_NAME = AppIcon;
-				CODE_SIGN_STYLE = Automatic;
+				ASSETCATALOG_COMPILER_APPICON_NAME = "";
 				COMBINE_HIDPI_IMAGES = YES;
-				DEVELOPMENT_TEAM = "";
-				ENABLE_HARDENED_RUNTIME = YES;
 				GENERATE_INFOPLIST_FILE = YES;
 				INFOPLIST_KEY_CFBundleDisplayName = FilmForge;
+				INFOPLIST_KEY_CFBundleIdentifier = com.tankywozere.FilmForge;
+				INFOPLIST_KEY_CFBundleName = FilmForge;
+				INFOPLIST_KEY_CFBundleShortVersionString = 1.0.0;
+				INFOPLIST_KEY_CFBundleVersion = 1;
 				INFOPLIST_KEY_LSApplicationCategoryType = "public.app-category.photography";
-				INFOPLIST_KEY_NSHumanReadableCopyright = "Copyright © 2026 FilmForge";
+				INFOPLIST_KEY_NSHighResolutionCapable = YES;
+				INFOPLIST_KEY_NSHumanReadableCopyright = "Copyright © 2026";
 				LD_RUNPATH_SEARCH_PATHS = (
 					"$(inherited)",
 					"@executable_path/../Frameworks",
 				);
-				PRODUCT_BUNDLE_IDENTIFIER = com.filmforge.app;
+				PRODUCT_MODULE_NAME = FilmForge;
 				PRODUCT_NAME = FilmForge;
 				SDKROOT = macosx;
 			};
@@ -333,8 +367,13 @@
 				CLANG_WARN_UNGUARDED_AVAILABILITY = YES_AGGRESSIVE;
 				CLANG_WARN_UNREACHABLE_CODE = YES;
 				CLANG_WARN__DUPLICATE_METHOD_MATCH = YES;
+				CODE_SIGN_IDENTITY = "Apple Development";
+				CODE_SIGN_STYLE = Automatic;
 				COPY_PHASE_STRIP = NO;
+				CURRENT_PROJECT_VERSION = 1;
 				DEBUG_INFORMATION_FORMAT = dwarf;
+				DEVELOPMENT_TEAM = H9GD4A7SQF;
+				ENABLE_HARDENED_RUNTIME = YES;
 				ENABLE_STRICT_OBJC_MSGSEND = YES;
 				ENABLE_TESTABILITY = YES;
 				GCC_C_LANGUAGE_STANDARD = gnu11;
@@ -351,35 +390,39 @@
 				GCC_WARN_UNINITIALIZED_AUTOS = YES_AGGRESSIVE;
 				GCC_WARN_UNUSED_FUNCTION = YES;
 				GCC_WARN_UNUSED_VARIABLE = YES;
-				MACOSX_DEPLOYMENT_TARGET = 14.0;
+				MACOSX_DEPLOYMENT_TARGET = 13.0;
+				MARKETING_VERSION = 1.0.0;
 				MTL_ENABLE_DEBUG_INFO = INCLUDE_SOURCE;
 				MTL_FAST_MATH = YES;
 				ONLY_ACTIVE_ARCH = YES;
+				PRODUCT_BUNDLE_IDENTIFIER = com.tankywozere.FilmForge;
 				PRODUCT_NAME = "$(TARGET_NAME)";
 				SDKROOT = macosx;
 				SWIFT_ACTIVE_COMPILATION_CONDITIONS = DEBUG;
 				SWIFT_OPTIMIZATION_LEVEL = "-Onone";
-				SWIFT_VERSION = 6.0;
+				SWIFT_VERSION = 5.0;
 			};
 			name = Debug;
 		};
 		F618377C0A95806C49EA55BD /* Release */ = {
 			isa = XCBuildConfiguration;
 			buildSettings = {
-				ASSETCATALOG_COMPILER_APPICON_NAME = AppIcon;
-				CODE_SIGN_STYLE = Automatic;
+				ASSETCATALOG_COMPILER_APPICON_NAME = "";
 				COMBINE_HIDPI_IMAGES = YES;
-				DEVELOPMENT_TEAM = "";
-				ENABLE_HARDENED_RUNTIME = YES;
 				GENERATE_INFOPLIST_FILE = YES;
 				INFOPLIST_KEY_CFBundleDisplayName = FilmForge;
+				INFOPLIST_KEY_CFBundleIdentifier = com.tankywozere.FilmForge;
+				INFOPLIST_KEY_CFBundleName = FilmForge;
+				INFOPLIST_KEY_CFBundleShortVersionString = 1.0.0;
+				INFOPLIST_KEY_CFBundleVersion = 1;
 				INFOPLIST_KEY_LSApplicationCategoryType = "public.app-category.photography";
-				INFOPLIST_KEY_NSHumanReadableCopyright = "Copyright © 2026 FilmForge";
+				INFOPLIST_KEY_NSHighResolutionCapable = YES;
+				INFOPLIST_KEY_NSHumanReadableCopyright = "Copyright © 2026";
 				LD_RUNPATH_SEARCH_PATHS = (
 					"$(inherited)",
 					"@executable_path/../Frameworks",
 				);
-				PRODUCT_BUNDLE_IDENTIFIER = com.filmforge.app;
+				PRODUCT_MODULE_NAME = FilmForge;
 				PRODUCT_NAME = FilmForge;
 				SDKROOT = macosx;
 			};

@@ -1,55 +1,52 @@
 # FilmForge
 
-FilmForge is a native macOS photo app proof of concept for applying original camera and film-inspired recipes to imported photos. It does not capture from the Mac camera and does not use cloud services, accounts, telemetry, or subscription logic.
+FilmForge is a macOS film-camera editor built in SwiftUI and Core Image. It is tuned around disposable cameras, HUJI-style date-stamped phone-film looks, Dazz-style app-camera processing, lab print fade, halation, bloom, grain, lens softness, leaks, dust, and compact-camera colour response.
 
-## What Works In This Build
+![FilmForge app](docs/screenshots/filmforge-app.png)
 
-- Import JPG, PNG, HEIC, TIFF, and other system-supported image files.
-- Drag a photo into the preview area or use `File > Open Photo...`.
-- Choose from 12 camera profiles and compatible film/sensor responses.
-- Adjust intensity, exposure, temperature, tint, grain, bloom, halation, vignette, fade, softness, dust, and border.
-- Toggle between original and processed preview.
-- Export JPG or PNG without overwriting the original image.
+## Highlights
 
-## Build And Run
+- 24 reference-built film looks across Kodak FunSaver, Fuji QuickSnap, HUJI, Dazz, and imperfect lab-print families.
+- Modular preset controls for Tone, Colour, LUT, Grain, Glow, Lens, and Artefacts instead of one blunt intensity slider.
+- Scene-aware processing that adapts highlight rolloff, grain, bloom, halation, and colour response to the imported image.
+- Core Image pipeline for tone curves, print response, LUT blending, camera response, halation, bloom, grain, chromatic aberration, edge softness, vignette, dust, scratches, leaks, and optional date stamps.
+- Preview and export share the same rendering path, so what you tune is what you save.
+- No artificial white flash-circle overlay.
 
-Requirements:
+![FilmForge controls](docs/screenshots/filmforge-controls.png)
 
-- macOS with Xcode 26.5 or compatible modern Xcode.
-- XcodeGen installed at `/opt/homebrew/bin/xcodegen` or available on `PATH`.
+## Preset Families
 
-Generate the project:
+- Kodak disposable: FunSaver 800, Overexposed, Wedding, Low Light, Sun Haze.
+- Fuji disposable: QuickSnap 400, QuickSnap Green, Coastal Blue, Selfie Print.
+- HUJI style: Direct, Board Dark, Light Leak, Red Leak, Alley Green, Date Night.
+- Dazz style: Organic, D Exp, CPM35, Night Market, Classic Room, DFuns Market, Soft Portrait, Parallax Dark.
+- Print damage: Imperfect Lab Print.
+
+## Build
+
+The app can be built either as a Swift package or through the generated Xcode project.
 
 ```sh
+swift test
+swift run FilmForge --smoke-render
 xcodegen generate
+xcodebuild -project FilmForge.xcodeproj -scheme FilmForge -configuration Debug -derivedDataPath .xcode-derived build
+open .xcode-derived/Build/Products/Debug/FilmForge.app
 ```
 
-Build from the command line:
+## Reference Analysis
+
+The reference-image analyzer is included as a command-line mode:
 
 ```sh
-xcodebuild -project FilmForge.xcodeproj -scheme FilmForge -configuration Debug -destination 'platform=macOS' build
+swift run FilmForge --analyze-references references/film-look
 ```
 
-Open in Xcode:
+It writes aggregate look metrics to `references/film-look/ANALYSIS.md` and `references/film-look/analysis.json`. The raw downloaded reference images are ignored from git; the manifest and analysis files are kept so the preset decisions remain auditable without publishing third-party imagery.
 
-```sh
-open FilmForge.xcodeproj
-```
+## Requirements
 
-## Project Layout
-
-- `FilmForge/Sources/App`: app entry point.
-- `FilmForge/Sources/UI`: SwiftUI editor.
-- `FilmForge/Sources/Models`: profile, recipe, and adjustment models.
-- `FilmForge/Sources/Profiles`: camera catalog, film stock catalog, and recipe composer.
-- `FilmForge/Sources/Pipeline`: reusable Core Image film engine.
-- `FilmForge/Sources/Services`: import, preview, export, and editor orchestration.
-- `docs/film_filter_research.md`: research foundation.
-- `docs/camera_film_profile_research.md`: camera/film profile research and implementation mapping.
-- `docs/architecture.md`: implementation architecture.
-- `docs/profile_design.md`: profile recipe design.
-- `docs/roadmap.md`: next steps.
-
-## Design Principle
-
-FilmForge is built around reusable camera-plus-film recipes, not one-off hardcoded filters. The UI selects a `CameraProfile` and `FilmStock`; FilmForge composes them into `FilmProfile` data, and the Core Image pipeline interprets that data through composable stages.
+- macOS 13 or newer
+- Xcode with Swift 5.9 support
+- XcodeGen, for regenerating `FilmForge.xcodeproj`
