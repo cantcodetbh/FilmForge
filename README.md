@@ -43,7 +43,7 @@ The reference-image analyzer is included as a command-line mode:
 swift run FilmForge --analyze-references references/film-look
 ```
 
-It writes aggregate look metrics to `references/film-look/ANALYSIS.md` and `references/film-look/analysis.json`. The raw downloaded reference images are ignored from git; the manifest and analysis files are kept so the preset decisions remain auditable without publishing third-party imagery.
+It writes aggregate look metrics to `references/film-look/ANALYSIS.md` and `references/film-look/analysis.json`.
 
 ## Requirements
 
